@@ -21,6 +21,12 @@ class Initiative(Base):
     category = Column(String, nullable=True)
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
+    # Session-level fields for bookable slot display
+    session_date = Column(Date, nullable=True)
+    session_time = Column(String, nullable=True)  # e.g. "10:00 AM - 11:00 AM"
+    trainer_name = Column(String, nullable=True)
+    total_slots = Column(Integer, nullable=True, default=20)
+    location = Column(String, nullable=True)
 
     # Relationships
     sessions = relationship("Session", back_populates="initiative")
