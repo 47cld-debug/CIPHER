@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, Typography, Container, Grid, CircularProgress, Card } from '@mui/material';
+import { Box, Typography, Container, Grid, CircularProgress, Card, Button } from '@mui/material';
 import { useDashboard as useDashboardData } from '../../hooks/useApi';
+import { useAuth } from '../../contexts/AuthContext';
 import LearningProgressWidget from './widgets/LearningProgressWidget';
 import UpcomingCoursesWidget from './widgets/UpcomingCoursesWidget';
 import CareerGoalsWidget from './widgets/CareerGoalsWidget';
@@ -9,7 +10,9 @@ import WellnessInitiativesWidget from './widgets/WellnessInitiativesWidget';
 import type { UserWidget } from '../../types/dashboard';
 
 const Dashboard: React.FC = () => {
-  const { data: dashboard, isLoading } = useDashboardData();
+  const { token } = useAuth();
+  const hasToken = !!token || (typeof window !== 'undefined' && !!localStorage.getItem('access_token'));
+  const { data: dashboard, isLoading, isError, error, refetch } = useDashboardData(hasToken);
 
   if (isLoading) {
     return (
@@ -17,6 +20,33 @@ const Dashboard: React.FC = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
           <CircularProgress sx={{ color: '#DC143C' }} />
         </Box>
+      </Container>
+    );
+  }
+
+  if (isError) {
+    const message = (error as any)?.response?.data?.detail ?? 'Failed to load dashboard';
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Card
+          sx={{
+            textAlign: 'center',
+            py: 6,
+            px: 3,
+            borderLeft: '4px solid #DC143C',
+            borderRadius: 3,
+          }}
+        >
+          <Typography variant="h6" sx={{ color: '#DC143C', mb: 2, fontWeight: 600 }}>
+            Dashboard unavailable
+          </Typography>
+          <Typography color="text.secondary" sx={{ mb: 3 }}>
+            {message}
+          </Typography>
+          <Button variant="contained" onClick={() => refetch()} sx={{ bgcolor: '#DC143C', '&:hover': { bgcolor: '#8B0000' } }}>
+            Retry
+          </Button>
+        </Card>
       </Container>
     );
   }

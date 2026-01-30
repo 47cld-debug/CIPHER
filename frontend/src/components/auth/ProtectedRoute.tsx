@@ -9,8 +9,15 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
   const { isAuthenticated, user } = useAuth();
+  // Fallback: treat as authenticated if token is in localStorage (avoids redirect to login
+  // when navigating to /dashboard right after login before context state has updated)
+  const hasStoredAuth =
+    typeof window !== 'undefined' &&
+    !!localStorage.getItem('access_token') &&
+    !!localStorage.getItem('user');
+  const authenticated = isAuthenticated || hasStoredAuth;
 
-  if (!isAuthenticated) {
+  if (!authenticated) {
     return <Navigate to="/login" replace />;
   }
 

@@ -68,10 +68,11 @@ export const useDeleteEnrollment = () => {
 };
 
 // Dashboard hooks
-export const useDashboard = () => {
+export const useDashboard = (enabled = true) => {
   return useQuery({
     queryKey: ['dashboard'],
     queryFn: () => dashboardApi.getDashboard(),
+    enabled,
     retry: 1,
     retryDelay: 1000,
     staleTime: 30000,
