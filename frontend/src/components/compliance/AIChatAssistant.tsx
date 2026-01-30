@@ -1,0 +1,314 @@
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Box,
+  Paper,
+  TextField,
+  IconButton,
+  Typography,
+  CircularProgress,
+  Avatar,
+  Fade,
+} from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import PersonIcon from '@mui/icons-material/Person';
+import { useAIChat } from '../../hooks/useApi';
+import { useUI } from '../../contexts/UIContext';
+
+interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'ai';
+  timestamp: Date;
+}
+
+const AIChatAssistant: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      text: "Hello! I'm your AI compliance assistant. Ask me anything about company policies, leave policies, expenses, or compliance questions.",
+      sender: 'ai',
+      timestamp: new Date(),
+    },
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatMutation = useAIChat();
+  const { addNotification } = useUI();
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: input.trim(),
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await chatMutation.mutateAsync({
+        message: input.trim(),
+        context: 'compliance',
+      });
+
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: response.response,
+        sender: 'ai',
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error: any) {
+      addNotification({
+        id: Date.now().toString(),
+        message: error.response?.data?.detail || 'Failed to get AI response. Please try again.',
+        type: 'error',
+      });
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm having trouble processing your question right now. Please try again later or contact HR directly.",
+        sender: 'ai',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  if (!isOpen) {
+    return (
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          zIndex: 1000,
+        }}
+      >
+        <IconButton
+          onClick={() => setIsOpen(true)}
+          sx={{
+            width: 64,
+            height: 64,
+            background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
+            color: 'white',
+            boxShadow: 6,
+            '&:hover': {
+              background: 'linear-gradient(135deg, #B0122A 0%, #E55A25 100%)',
+              transform: 'scale(1.1)',
+            },
+            transition: 'all 0.3s ease',
+          }}
+        >
+          <SmartToyIcon sx={{ fontSize: 32 }} />
+        </IconButton>
+      </Box>
+    );
+  }
+
+  return (
+    <Fade in={isOpen}>
+      <Paper
+        elevation={24}
+        sx={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          width: { xs: 'calc(100vw - 48px)', sm: 400 },
+          height: 600,
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: 3,
+          border: '1px solid rgba(220, 20, 60, 0.2)',
+          zIndex: 1000,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header */}
+        <Box
+          sx={{
+            p: 2,
+            background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <SmartToyIcon />
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              AI Assistant
+            </Typography>
+          </Box>
+          <IconButton
+            size="small"
+            onClick={() => setIsOpen(false)}
+            sx={{ color: 'white' }}
+          >
+            <Typography variant="h6">×</Typography>
+          </IconButton>
+        </Box>
+
+        {/* Messages */}
+        <Box
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            bgcolor: 'rgba(0, 0, 0, 0.02)',
+          }}
+        >
+          {messages.map((message) => (
+            <Box
+              key={message.id}
+              sx={{
+                display: 'flex',
+                gap: 1,
+                justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start',
+              }}
+            >
+              {message.sender === 'ai' && (
+                <Avatar
+                  sx={{
+                    bgcolor: '#DC143C',
+                    width: 32,
+                    height: 32,
+                  }}
+                >
+                  <SmartToyIcon sx={{ fontSize: 18 }} />
+                </Avatar>
+              )}
+              <Paper
+                elevation={1}
+                sx={{
+                  p: 1.5,
+                  maxWidth: '75%',
+                  bgcolor: message.sender === 'user' ? '#DC143C' : 'white',
+                  color: message.sender === 'user' ? 'white' : 'text.primary',
+                  borderRadius: 2,
+                  border: message.sender === 'ai' ? '1px solid rgba(220, 20, 60, 0.2)' : 'none',
+                }}
+              >
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {message.text}
+                </Typography>
+              </Paper>
+              {message.sender === 'user' && (
+                <Avatar
+                  sx={{
+                    bgcolor: '#FF6B35',
+                    width: 32,
+                    height: 32,
+                  }}
+                >
+                  <PersonIcon sx={{ fontSize: 18 }} />
+                </Avatar>
+              )}
+            </Box>
+          ))}
+          {isLoading && (
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-start' }}>
+              <Avatar
+                sx={{
+                  bgcolor: '#DC143C',
+                  width: 32,
+                  height: 32,
+                }}
+              >
+                <SmartToyIcon sx={{ fontSize: 18 }} />
+              </Avatar>
+              <Paper
+                elevation={1}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: '1px solid rgba(220, 20, 60, 0.2)',
+                }}
+              >
+                <CircularProgress size={16} sx={{ color: '#DC143C' }} />
+              </Paper>
+            </Box>
+          )}
+          <div ref={messagesEndRef} />
+        </Box>
+
+        {/* Input */}
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1px solid rgba(220, 20, 60, 0.1)',
+            display: 'flex',
+            gap: 1,
+          }}
+        >
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Ask about policies, leave, expenses..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover fieldset': {
+                  borderColor: '#DC143C',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#DC143C',
+                },
+              },
+            }}
+          />
+          <IconButton
+            onClick={handleSend}
+            disabled={!input.trim() || isLoading}
+            sx={{
+              bgcolor: '#DC143C',
+              color: 'white',
+              '&:hover': {
+                bgcolor: '#B0122A',
+              },
+              '&:disabled': {
+                bgcolor: 'rgba(0, 0, 0, 0.12)',
+              },
+            }}
+          >
+            <SendIcon />
+          </IconButton>
+        </Box>
+      </Paper>
+    </Fade>
+  );
+};
+
+export default AIChatAssistant;
