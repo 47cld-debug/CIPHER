@@ -57,6 +57,16 @@ export const useUploadCertificate = () => {
   });
 };
 
+export const useDeleteEnrollment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (enrollmentId: number) => learningApi.deleteEnrollment(enrollmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+    },
+  });
+};
+
 // Dashboard hooks
 export const useDashboard = () => {
   return useQuery({

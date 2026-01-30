@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, Float
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, Float, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
@@ -61,6 +61,7 @@ class Enrollment(Base):
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
     status = Column(Enum(EnrollmentStatus), default=EnrollmentStatus.ENROLLED, nullable=False)
     progress_state = Column(Enum(ProgressState), default=ProgressState.NOT_STARTED, nullable=False)
+    auto_enrolled = Column(Boolean, default=False, nullable=False)  # True if enrolled from AI chatbot
     enrolled_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

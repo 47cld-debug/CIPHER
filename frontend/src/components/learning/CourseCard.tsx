@@ -7,35 +7,84 @@ import {
   Button,
   Chip,
   Box,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import type { Course, Enrollment } from '../../types/learning';
 import ProgressModal from './ProgressModal';
-import CertificateUpload from './CertificateUpload';
+import { learningApi } from '../../api/learning';
+import { useUI } from '../../contexts/UIContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CourseCardProps {
   course: Course;
   enrollment?: Enrollment;
   onEnroll?: () => void;
+  onDelete?: () => void;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, onDelete }) => {
   const [progressModalOpen, setProgressModalOpen] = useState(false);
-  const [certificateModalOpen, setCertificateModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { addNotification } = useUI();
+  const queryClient = useQueryClient();
 
-  const handleCardClick = () => {
+  const handleCardClick = async () => {
     if (enrollment) {
       setProgressModalOpen(true);
-    } else if (onEnroll) {
-      onEnroll();
+    } else {
+      // Auto-enroll and show progress modal
+      try {
+        const newEnrollment = await learningApi.enrollInCourse(course.id, false);
+        addNotification({
+          id: Date.now().toString(),
+          message: `Enrolled in ${course.title}`,
+          type: 'success',
+        });
+        queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+        // Show progress modal after enrollment
+        setTimeout(() => {
+          setProgressModalOpen(true);
+        }, 100);
+      } catch (error: any) {
+        addNotification({
+          id: Date.now().toString(),
+          message: error.response?.data?.detail || 'Failed to enroll',
+          type: 'error',
+        });
+      }
     }
   };
 
-  const handleProgressUpdate = (progress: string) => {
-    if (progress === 'COMPLETED' && enrollment) {
-      setProgressModalOpen(false);
-      setCertificateModalOpen(true);
+  const handleDelete = async () => {
+    if (!enrollment) return;
+    
+    try {
+      await learningApi.deleteEnrollment(enrollment.id);
+      addNotification({
+        id: Date.now().toString(),
+        message: 'Course removed from your learning profile',
+        type: 'success',
+      });
+      queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+      setDeleteDialogOpen(false);
+      if (onDelete) {
+        onDelete();
+      }
+    } catch (error: any) {
+      addNotification({
+        id: Date.now().toString(),
+        message: error.response?.data?.detail || 'Failed to delete enrollment',
+        type: 'error',
+      });
     }
   };
+
+  const showDeleteButton = enrollment?.auto_enrolled && enrollment.progress_state === 'NOT_STARTED';
 
   const getProgressColor = (progress: string) => {
     const colors: Record<string, string> = {
@@ -75,7 +124,27 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll })
               : 'linear-gradient(90deg, #FF6B35 0%, #FF8C42 100%)',
           }}
         />
-        <CardContent sx={{ flexGrow: 1, p: 3 }}>
+        <CardContent sx={{ flexGrow: 1, p: 3, position: 'relative' }}>
+          {showDeleteButton && (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeleteDialogOpen(true);
+              }}
+              sx={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                color: '#f44336',
+                '&:hover': {
+                  bgcolor: 'rgba(244, 67, 54, 0.1)',
+                },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          )}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
             <Typography
               variant="h6"
@@ -212,21 +281,45 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll })
       </Card>
 
       {enrollment && (
-        <>
-          <ProgressModal
-            open={progressModalOpen}
-            onClose={() => setProgressModalOpen(false)}
-            course={course}
-            enrollmentId={enrollment.id}
-            currentProgress={enrollment.progress_state}
-          />
-          <CertificateUpload
-            open={certificateModalOpen}
-            onClose={() => setCertificateModalOpen(false)}
-            enrollmentId={enrollment.id}
-          />
-        </>
+        <ProgressModal
+          open={progressModalOpen}
+          onClose={() => {
+            setProgressModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+          }}
+          course={course}
+          enrollmentId={enrollment.id}
+          currentProgress={enrollment.progress_state}
+        />
       )}
+
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle sx={{ color: '#DC143C', fontWeight: 600 }}>
+          Remove Course
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Are you sure you want to remove "{course.title}" from your learning profile?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} sx={{ color: '#666' }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            variant="contained"
+            sx={{
+              bgcolor: '#f44336',
+              '&:hover': {
+                bgcolor: '#d32f2f',
+              },
+            }}
+          >
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

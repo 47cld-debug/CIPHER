@@ -22,9 +22,11 @@ export interface Enrollment {
   course_id: number;
   status: EnrollmentStatus;
   progress_state: ProgressState;
+  auto_enrolled?: boolean;
   enrolled_at: string;
   updated_at?: string;
   course: Course;
+  certificate?: Certificate;
 }
 
 export interface Certificate {

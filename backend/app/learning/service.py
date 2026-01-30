@@ -38,7 +38,7 @@ class LearningService:
         """Get course by ID"""
         return self.course_repo.get(course_id)
 
-    def enroll_user(self, user_id: int, course_id: int) -> Optional[Enrollment]:
+    def enroll_user(self, user_id: int, course_id: int, auto_enrolled: bool = False) -> Optional[Enrollment]:
         """Enroll user in course"""
         # Check if already enrolled
         existing = self.enrollment_repo.get_by_user_and_course(user_id, course_id)
@@ -49,7 +49,8 @@ class LearningService:
             user_id=user_id,
             course_id=course_id,
             status=EnrollmentStatus.ENROLLED,
-            progress_state=ProgressState.NOT_STARTED
+            progress_state=ProgressState.NOT_STARTED,
+            auto_enrolled=auto_enrolled
         )
         return self.enrollment_repo.create(enrollment)
 
@@ -103,25 +104,80 @@ class LearningService:
         return self.certificate_repo.create(certificate)
 
     async def get_recommendations(self, user: User) -> List[dict]:
-        """Get AI-based course recommendations"""
-        enrollments = self.get_user_enrollments(user.id)
-        completed_courses = [
-            e.course.title for e in enrollments
-            if e.progress_state in [ProgressState.HIGH, ProgressState.COMPLETED]
-        ]
+        """Get AI-based course recommendations based on employee status"""
+        from models.employee import Employee
         
-        # Get user skills from enrollments (simplified)
-        user_skills = []
+        enrollments = self.get_user_enrollments(user.id)
+        
+        # Check if new employee (no enrollments)
+        if len(enrollments) == 0:
+            # Get employee role from Employee model
+            employee = self.db.query(Employee).filter(Employee.employee_number == user.employee_number).first()
+            if employee and employee.role:
+                # Recommend courses based on role
+                role_lower = employee.role.lower()
+                # Search for courses matching role
+                courses = self.course_repo.search(role_lower, skip=0, limit=5)
+                if not courses:
+                    # Fallback: get any courses
+                    courses = self.course_repo.get_all(skip=0, limit=5)
+                return [
+                    {
+                        "title": c.title,
+                        "description": c.description or "",
+                        "id": c.id,
+                        "course_type": c.course_type.value,
+                        "external_url": c.external_url
+                    }
+                    for c in courses
+                ]
+        
+        # Existing employee: find max course category/type
+        category_counts = {}
         for enrollment in enrollments:
-            if enrollment.progress_state == ProgressState.COMPLETED:
-                # Add course skills (would need to join with course_skills table)
-                pass
+            if enrollment.course and enrollment.course.category:
+                category = enrollment.course.category
+                category_counts[category] = category_counts.get(category, 0) + 1
+        
+        if category_counts:
+            # Get category with max count
+            max_category = max(category_counts, key=category_counts.get)
+            # Get courses from that category
+            all_courses = self.course_repo.get_all(skip=0, limit=100)
+            recommended_courses = [c for c in all_courses if c.category == max_category][:5]
+            
+            if recommended_courses:
+                return [
+                    {
+                        "title": c.title,
+                        "description": c.description or "",
+                        "id": c.id,
+                        "course_type": c.course_type.value,
+                        "external_url": c.external_url
+                    }
+                    for c in recommended_courses
+                ]
+        
+        # Fallback: get any courses
+        courses = self.course_repo.get_all(skip=0, limit=5)
+        return [
+            {
+                "title": c.title,
+                "description": c.description or "",
+                "id": c.id,
+                "course_type": c.course_type.value,
+                "external_url": c.external_url
+            }
+            for c in courses
+        ]
 
-        # Get user goals (would need to import from career module)
-        user_goals = []
-
-        return await openai_service.get_learning_recommendations(
-            user_skills=user_skills,
-            completed_courses=completed_courses,
-            user_goals=user_goals
-        )
+    def delete_enrollment(self, enrollment_id: int, user_id: int) -> bool:
+        """Delete enrollment if auto_enrolled and NOT_STARTED"""
+        enrollment = self.enrollment_repo.get(enrollment_id)
+        if not enrollment or enrollment.user_id != user_id:
+            return False
+        
+        # Only allow deletion if auto_enrolled and NOT_STARTED
+        if enrollment.auto_enrolled and enrollment.progress_state == ProgressState.NOT_STARTED:
+            return self.enrollment_repo.delete(enrollment_id)
+        return False

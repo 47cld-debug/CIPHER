@@ -42,15 +42,30 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
 @router.post("/courses/{course_id}/enroll", response_model=EnrollmentResponse)
 def enroll_in_course(
     course_id: int,
+    auto_enrolled: bool = False,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Enroll user in course"""
     service = LearningService(db)
-    enrollment = service.enroll_user(current_user.id, course_id)
+    enrollment = service.enroll_user(current_user.id, course_id, auto_enrolled=auto_enrolled)
     if not enrollment:
         raise HTTPException(status_code=400, detail="Failed to enroll")
     return enrollment
+
+
+@router.delete("/enrollments/{enrollment_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_enrollment(
+    enrollment_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete enrollment (only if auto_enrolled and NOT_STARTED)"""
+    service = LearningService(db)
+    success = service.delete_enrollment(enrollment_id, current_user.id)
+    if not success:
+        raise HTTPException(status_code=400, detail="Cannot delete this enrollment")
+    return None
 
 
 @router.get("/enrollments", response_model=List[EnrollmentResponse])

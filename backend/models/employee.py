@@ -11,3 +11,4 @@ class Employee(Base):
     full_name = Column(String, nullable=False)
     has_admin_access = Column(Boolean, default=False, nullable=False)
     department = Column(String, nullable=True)
+    role = Column(String, nullable=True)  # Job title/role (e.g., "tester", "developer", "manager")

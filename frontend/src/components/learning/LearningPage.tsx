@@ -1,13 +1,15 @@
-import React from 'react';
-import { Box, Typography, Container, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Container, Paper, TextField, InputAdornment } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
+import SearchIcon from '@mui/icons-material/Search';
 import CourseList from './CourseList';
-import RecommendationsSection from './RecommendationsSection';
-import AILearningPrompt from './AILearningPrompt';
-import { useRecommendations } from '../../hooks/useApi';
+import CompletedCoursesSection from './CompletedCoursesSection';
+import AILearningChatbot from './AILearningChatbot';
+import { useEnrollments } from '../../hooks/useApi';
 
 const LearningPage: React.FC = () => {
-  const { data: recommendations = [], isLoading: recommendationsLoading, isError: recommendationsError } = useRecommendations();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { data: enrollments = [] } = useEnrollments();
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -21,7 +23,7 @@ const LearningPage: React.FC = () => {
           border: '1px solid rgba(220, 20, 60, 0.1)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
           <Box
             sx={{
               p: 2,
@@ -34,7 +36,7 @@ const LearningPage: React.FC = () => {
           >
             <SchoolIcon sx={{ color: 'white', fontSize: 32 }} />
           </Box>
-          <Box>
+          <Box sx={{ flex: 1 }}>
             <Typography
               variant="h4"
               component="h1"
@@ -48,18 +50,42 @@ const LearningPage: React.FC = () => {
               Learning & Development
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Explore courses and enhance your skills
+              Search courses or use AI chatbot for personalized recommendations
             </Typography>
           </Box>
         </Box>
+
+        {/* Search Bar */}
+        <TextField
+          fullWidth
+          placeholder="Search courses by title, description, or category..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: '#DC143C' }} />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+              bgcolor: 'white',
+              '&:hover fieldset': {
+                borderColor: '#DC143C',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#DC143C',
+              },
+            },
+          }}
+        />
       </Paper>
-      <AILearningPrompt />
-      <RecommendationsSection
-        recommendations={recommendations}
-        isLoading={recommendationsLoading}
-        isError={recommendationsError}
-      />
-      <CourseList />
+
+      <CourseList searchQuery={searchQuery || undefined} />
+      <CompletedCoursesSection enrollments={enrollments} />
+      <AILearningChatbot />
     </Container>
   );
 };

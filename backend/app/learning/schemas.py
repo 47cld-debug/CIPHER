@@ -31,24 +31,6 @@ class EnrollmentBase(BaseModel):
     course_id: int
 
 
-class EnrollmentResponse(BaseModel):
-    id: int
-    user_id: int
-    course_id: int
-    status: EnrollmentStatus
-    progress_state: ProgressState
-    enrolled_at: datetime
-    updated_at: Optional[datetime] = None
-    course: CourseResponse
-
-    class Config:
-        from_attributes = True
-
-
-class ProgressUpdateRequest(BaseModel):
-    progress_state: ProgressState
-
-
 class CertificateUploadResponse(BaseModel):
     id: int
     enrollment_id: int
@@ -58,6 +40,26 @@ class CertificateUploadResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class EnrollmentResponse(BaseModel):
+    id: int
+    user_id: int
+    course_id: int
+    status: EnrollmentStatus
+    progress_state: ProgressState
+    auto_enrolled: bool = False
+    enrolled_at: datetime
+    updated_at: Optional[datetime] = None
+    course: CourseResponse
+    certificate: Optional[CertificateUploadResponse] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ProgressUpdateRequest(BaseModel):
+    progress_state: ProgressState
 
 
 class RecommendationResponse(BaseModel):

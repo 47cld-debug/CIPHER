@@ -56,11 +56,18 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
         type: 'success',
       });
 
+      // If COMPLETED, close modal (certificate upload handled in CompletedCoursesSection)
+      if (selectedProgress === 'COMPLETED') {
+        onClose();
+        return;
+      }
+
       // If external course and not completed, redirect to external URL
-      if (course.course_type === 'EXTERNAL' && selectedProgress !== 'COMPLETED' && course.external_url) {
+      if (course.course_type === 'EXTERNAL' && course.external_url) {
         window.open(course.external_url, '_blank');
       }
 
+      // If internal course, stay on page
       onClose();
     } catch (error: any) {
       addNotification({
@@ -73,10 +80,10 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
 
   const progressOptions = [
     { value: 'NOT_STARTED', label: 'Not Started', color: '#9e9e9e' },
-    { value: 'LOW', label: 'Low (0-30%)', color: '#ff9800' },
-    { value: 'MEDIUM', label: 'Medium (30-70%)', color: '#ffc107' },
-    { value: 'HIGH', label: 'High (70-99%)', color: '#4caf50' },
-    { value: 'COMPLETED', label: 'Completed', color: '#2196f3' },
+    { value: 'LOW', label: 'Low (10-40%)', color: '#ff9800' },
+    { value: 'MEDIUM', label: 'Medium (40-70%)', color: '#ffc107' },
+    { value: 'HIGH', label: 'High (70-90%)', color: '#4caf50' },
+    { value: 'COMPLETED', label: 'Completed (100%)', color: '#2196f3' },
   ];
 
   return (

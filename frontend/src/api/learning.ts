@@ -18,8 +18,8 @@ export const learningApi = {
     return response.data;
   },
 
-  enrollInCourse: async (courseId: number): Promise<Enrollment> => {
-    const response = await apiClient.post(`/learning/courses/${courseId}/enroll`);
+  enrollInCourse: async (courseId: number, autoEnrolled: boolean = false): Promise<Enrollment> => {
+    const response = await apiClient.post(`/learning/courses/${courseId}/enroll?auto_enrolled=${autoEnrolled}`);
     return response.data;
   },
 
@@ -59,5 +59,9 @@ export const learningApi = {
   getRecommendations: async (): Promise<Recommendation[]> => {
     const response = await apiClient.get('/learning/recommendations');
     return response.data;
+  },
+
+  deleteEnrollment: async (enrollmentId: number): Promise<void> => {
+    await apiClient.delete(`/learning/enrollments/${enrollmentId}`);
   },
 };

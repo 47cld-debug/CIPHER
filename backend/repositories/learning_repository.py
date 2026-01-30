@@ -16,8 +16,12 @@ class CourseRepository(BaseRepository[Course]):
         ).offset(skip).limit(limit).all()
 
     def search(self, query: str, skip: int = 0, limit: int = 100) -> List[Course]:
+        """Search courses by title, description, or category"""
+        search_term = f"%{query}%"
         return self.db.query(Course).filter(
-            Course.title.ilike(f"%{query}%")
+            (Course.title.ilike(search_term)) |
+            (Course.description.ilike(search_term)) |
+            (Course.category.ilike(search_term))
         ).offset(skip).limit(limit).all()
 
 
@@ -26,7 +30,11 @@ class EnrollmentRepository(BaseRepository[Enrollment]):
         super().__init__(Enrollment, db)
 
     def get_by_user(self, user_id: int) -> List[Enrollment]:
-        return self.db.query(Enrollment).filter(Enrollment.user_id == user_id).all()
+        from sqlalchemy.orm import joinedload
+        return self.db.query(Enrollment).options(
+            joinedload(Enrollment.course),
+            joinedload(Enrollment.certificate)
+        ).filter(Enrollment.user_id == user_id).all()
 
     def get_by_user_and_course(self, user_id: int, course_id: int) -> Optional[Enrollment]:
         return self.db.query(Enrollment).filter(
@@ -41,6 +49,15 @@ class EnrollmentRepository(BaseRepository[Enrollment]):
                 enrollment.status = "COMPLETED"
             return self.update(enrollment)
         return None
+
+    def delete(self, enrollment_id: int) -> bool:
+        """Delete enrollment"""
+        enrollment = self.get(enrollment_id)
+        if enrollment:
+            self.db.delete(enrollment)
+            self.db.commit()
+            return True
+        return False
 
 
 class CertificateRepository(BaseRepository[Certificate]):
