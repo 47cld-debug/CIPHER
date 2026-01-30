@@ -100,6 +100,36 @@ export const useAppraisals = () => {
   });
 };
 
+export const useCareerSummary = () => {
+  return useQuery({
+    queryKey: ['career', 'summary'],
+    queryFn: () => careerApi.getCareerSummary(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const useCareerSkills = () => {
+  return useQuery({
+    queryKey: ['career', 'skills'],
+    queryFn: () => careerApi.getCareerSkills(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const useCareerAchievements = () => {
+  return useQuery({
+    queryKey: ['career', 'achievements'],
+    queryFn: () => careerApi.getCareerAchievements(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
 // Compliance hooks
 export const usePolicies = (search?: string) => {
   return useQuery({

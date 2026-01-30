@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
-from models.career import Goal, Appraisal, Feedback
+from models.career import Goal, Appraisal, Feedback, CareerProfile
 from repositories.base import BaseRepository
 
 
@@ -26,3 +26,11 @@ class FeedbackRepository(BaseRepository[Feedback]):
 
     def get_by_user(self, user_id: int) -> List[Feedback]:
         return self.db.query(Feedback).filter(Feedback.user_id == user_id).all()
+
+
+class CareerProfileRepository(BaseRepository[CareerProfile]):
+    def __init__(self, db: Session):
+        super().__init__(CareerProfile, db)
+
+    def get_by_user_id(self, user_id: int) -> Optional[CareerProfile]:
+        return self.db.query(CareerProfile).filter(CareerProfile.user_id == user_id).first()

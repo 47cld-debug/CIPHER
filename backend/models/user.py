@@ -30,3 +30,4 @@ class User(Base):
     reminders = relationship("Reminder", back_populates="user")
     sessions = relationship("Session", back_populates="user")
     user_widgets = relationship("UserWidget", back_populates="user")
+    career_profile = relationship("CareerProfile", back_populates="user", uselist=False)

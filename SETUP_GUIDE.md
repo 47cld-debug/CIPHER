@@ -109,6 +109,35 @@ Frontend should be running at `http://localhost:5173`
 
 4. **Test Pages:** Navigate through Dashboard, Learning, Career, Compliance, Wellness
 
+## How to Run the Wellness Part
+
+The Wellness module includes **Wellness Initiatives** (browse and book sessions) and **My Sessions** (view/cancel your bookings).
+
+### 1. Backend and frontend must be running
+
+- Backend: `cd backend` → `venv\Scripts\activate` → `uvicorn app.main:app --reload`
+- Frontend: `cd frontend` → `npm run dev`
+- Open **http://localhost:5173** and log in (e.g. EMP001).
+
+### 2. Seed wellness data (so you see initiatives and sessions)
+
+From the **backend** folder (with venv activated):
+
+```bash
+python scripts/seed_wellness_dummy.py
+```
+
+- Requires existing **users** in the DB (log in at least once with EMP001, or run `seed_employees.py` first).
+- This adds sample initiatives (Daily Exercise, Yoga, Counseling, Nutrition Workshop) and sample session bookings.
+
+### 3. Use Wellness in the app
+
+- In the sidebar, click **Wellness**.
+- **Wellness Initiatives** – view all programs and book a session.
+- **My Sessions** – view and cancel your booked sessions.
+
+If you see empty lists, run step 2 and refresh the page.
+
 ## Test Employee Numbers
 
 - `EMP001` - Regular employee

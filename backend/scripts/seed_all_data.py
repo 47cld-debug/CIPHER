@@ -208,43 +208,49 @@ def seed_goals(users):
             "title": "Complete Python Certification",
             "description": "Finish the Python for Data Science course and obtain certification by end of quarter",
             "target_date": date.today() + timedelta(days=60),
-            "status": GoalStatus.IN_PROGRESS
+            "status": GoalStatus.IN_PROGRESS,
+            "progress": 65,
         },
         {
             "user": users[0],
             "title": "Lead a Team Project",
             "description": "Take on a leadership role in the upcoming Q2 project initiative",
             "target_date": date.today() + timedelta(days=90),
-            "status": GoalStatus.PENDING
+            "status": GoalStatus.PENDING,
+            "progress": 0,
         },
         {
             "user": users[1],
             "title": "Master React Advanced Patterns",
             "description": "Complete the React course and implement advanced patterns in current project",
             "target_date": date.today() + timedelta(days=45),
-            "status": GoalStatus.IN_PROGRESS
+            "status": GoalStatus.IN_PROGRESS,
+            "progress": 40,
         },
         {
             "user": users[1],
             "title": "Improve Communication Skills",
             "description": "Complete communication course and apply learnings in team meetings",
             "target_date": date.today() + timedelta(days=30),
-            "status": GoalStatus.IN_PROGRESS
+            "status": GoalStatus.IN_PROGRESS,
+            "progress": 75,
         },
         {
             "user": users[2],
             "title": "AWS Cloud Certification",
             "description": "Complete AWS architecture course and pass certification exam",
             "target_date": date.today() + timedelta(days=120),
-            "status": GoalStatus.PENDING
+            "status": GoalStatus.PENDING,
+            "progress": 0,
         },
         {
             "user": users[2],
             "title": "Enhance Emotional Intelligence",
             "description": "Complete EI course and improve workplace relationships",
             "target_date": date.today() + timedelta(days=20),
-            "status": GoalStatus.COMPLETED
-        }
+            "status": GoalStatus.COMPLETED,
+            "progress": 100,
+        },
     ]
     
     for goal_data in goals_data:

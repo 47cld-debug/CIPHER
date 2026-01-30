@@ -27,10 +27,27 @@ class Goal(Base):
     description = Column(Text, nullable=True)
     target_date = Column(Date, nullable=True)
     status = Column(Enum(GoalStatus), default=GoalStatus.PENDING, nullable=False)
+    progress = Column(Integer, nullable=True)  # 0-100 percentage
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     user = relationship("User", back_populates="goals")
+
+
+class CareerProfile(Base):
+    __tablename__ = "career_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
+    current_level = Column(String, nullable=True)  # e.g. "Senior Developer"
+    next_level = Column(String, nullable=True)   # e.g. "Team Lead"
+    progress_pct = Column(Integer, nullable=True)  # 0-100 towards next level
+    years_experience = Column(Integer, nullable=True)
+    company_years = Column(Integer, nullable=True)
+    level_badge = Column(String, nullable=True)    # e.g. "Level 5"
+
+    # Relationships
+    user = relationship("User", back_populates="career_profile")
 
 
 class Appraisal(Base):
