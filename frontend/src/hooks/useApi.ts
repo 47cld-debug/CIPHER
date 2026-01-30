@@ -123,7 +123,7 @@ export const useReminders = () => {
 // Wellness hooks
 export const useInitiatives = () => {
   return useQuery({
-    queryKey: ['initiatives'],
+    queryKey: ['wellness', 'initiatives'],
     queryFn: () => wellnessApi.getInitiatives(),
     retry: 1,
     retryDelay: 1000,
@@ -131,9 +131,40 @@ export const useInitiatives = () => {
   });
 };
 
+export const useInitiativeDetail = (id: number | null) => {
+  return useQuery({
+    queryKey: ['wellness', 'initiative', id],
+    queryFn: () => wellnessApi.getInitiativeDetail(id!),
+    enabled: id != null,
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const useBookSession = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (initiativeId: number) => wellnessApi.bookSession(initiativeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wellness'] });
+    },
+  });
+};
+
+export const useCancelBooking = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (sessionId: number) => wellnessApi.cancelBooking(sessionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wellness'] });
+    },
+  });
+};
+
 export const useSessions = () => {
   return useQuery({
-    queryKey: ['sessions'],
+    queryKey: ['wellness', 'sessions'],
     queryFn: () => wellnessApi.getSessions(),
     retry: 1,
     retryDelay: 1000,

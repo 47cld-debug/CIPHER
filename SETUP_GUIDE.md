@@ -47,12 +47,19 @@ This is a condensed version of the setup process. For detailed instructions, see
    python scripts/seed_employees.py
    ```
 
-8. **Verify setup (optional):**
+8. **Seed wellness dummy data (optional):**  
+   To populate Wellness Initiatives and My Sessions with sample data:
+   ```bash
+   python scripts/seed_wellness_dummy.py
+   ```
+   Requires existing users (from step 7). Exits with a clear message if no users are found.
+
+9. **Verify setup (optional):**
    ```bash
    python scripts/verify_setup.py
    ```
 
-9. **Start server:**
+10. **Start server:**
    ```bash
    uvicorn app.main:app --reload
    ```
