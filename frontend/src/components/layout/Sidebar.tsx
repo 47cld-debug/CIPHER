@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, GraduationCap, Briefcase, Scale, Heart } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, Briefcase, Scale, Heart, Calendar, DollarSign } from 'lucide-react';
 import { useUI } from '../../contexts/UIContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -19,6 +19,8 @@ const Sidebar: React.FC = () => {
     { text: 'Career', icon: Briefcase, path: '/career' },
     { text: 'Compliance', icon: Scale, path: '/compliance' },
     { text: 'Wellness', icon: Heart, path: '/wellness' },
+    { text: 'Leave', icon: Calendar, path: '/leave' },
+    { text: 'Payroll', icon: DollarSign, path: '/payroll' },
   ];
 
   if (user?.role === 'ADMIN') {

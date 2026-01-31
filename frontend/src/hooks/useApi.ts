@@ -4,6 +4,8 @@ import { dashboardApi } from '../api/dashboard';
 import { careerApi } from '../api/career';
 import { complianceApi } from '../api/compliance';
 import { wellnessApi } from '../api/wellness';
+import { leaveApi } from '../api/leave';
+import { payrollApi } from '../api/payroll';
 import { aiApi } from '../api/ai';
 import { adminApi } from '../api/admin';
 import type { ProgressState } from '../types/learning';
@@ -305,5 +307,69 @@ export const useVerifyCertificate = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pendingCertificates'] });
     },
+  });
+};
+
+// Leave hooks
+export const useLeaveSummary = () => {
+  return useQuery({
+    queryKey: ['leave', 'summary'],
+    queryFn: () => leaveApi.getLeaveSummary(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const useLeaves = () => {
+  return useQuery({
+    queryKey: ['leaves'],
+    queryFn: () => leaveApi.getLeaves(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const useLeaveBalances = () => {
+  return useQuery({
+    queryKey: ['leave', 'balances'],
+    queryFn: () => leaveApi.getLeaveBalances(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const useCreateLeave = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (leaveData: { leave_type: string; start_date: string; end_date: string; reason?: string }) =>
+      leaveApi.createLeave(leaveData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave'] });
+      queryClient.invalidateQueries({ queryKey: ['leaves'] });
+    },
+  });
+};
+
+// Payroll hooks
+export const usePayrollSummary = () => {
+  return useQuery({
+    queryKey: ['payroll', 'summary'],
+    queryFn: () => payrollApi.getPayrollSummary(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const usePayslips = () => {
+  return useQuery({
+    queryKey: ['payroll', 'payslips'],
+    queryFn: () => payrollApi.getPayslips(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
   });
 };

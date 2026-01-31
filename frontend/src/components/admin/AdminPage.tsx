@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Container, Paper, Grid, Card, CardContent, Button, Tabs, Tab } from '@mui/material';
+import { Calendar, DollarSign } from 'lucide-react';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SchoolIcon from '@mui/icons-material/School';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
@@ -7,6 +8,8 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import CertificateVerification from './CertificateVerification';
 import CourseManagement from './CourseManagement';
 import DocumentUpload from './DocumentUpload';
+import LeaveManagement from './LeaveManagement';
+import PayrollManagement from './PayrollManagement';
 
 const AdminPage: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -81,12 +84,16 @@ const AdminPage: React.FC = () => {
           <Tab icon={<VerifiedUserIcon />} iconPosition="start" label="Certificate Verification" />
           <Tab icon={<SchoolIcon />} iconPosition="start" label="Course Management" />
           <Tab icon={<DescriptionIcon />} iconPosition="start" label="Compliance Documents" />
+          <Tab icon={<Calendar size={20} />} iconPosition="start" label="Leave Management" />
+          <Tab icon={<DollarSign size={20} />} iconPosition="start" label="Payroll Management" />
         </Tabs>
       </Paper>
 
       {tabValue === 0 && <CertificateVerification />}
       {tabValue === 1 && <CourseManagement />}
       {tabValue === 2 && <DocumentUpload />}
+      {tabValue === 3 && <LeaveManagement />}
+      {tabValue === 4 && <PayrollManagement />}
     </Container>
   );
 };

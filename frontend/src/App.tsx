@@ -18,6 +18,8 @@ import CareerPage from './components/career/CareerPage';
 import CompliancePage from './components/compliance/CompliancePage';
 import WellnessPage from './components/wellness/WellnessPage';
 import InitiativesListPage from './components/wellness/InitiativesListPage';
+import LeavePage from './components/leave/LeavePage';
+import PayrollPage from './components/payroll/PayrollPage';
 import InitiativeDetailPage from './components/wellness/InitiativeDetailPage';
 import MySessionsPage from './components/wellness/MySessionsPage';
 import AdminPage from './components/admin/AdminPage';
@@ -125,6 +127,26 @@ function App() {
                         <ProtectedRoute>
                           <Layout>
                             <MySessionsPage />
+                          </Layout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/leave"
+                      element={
+                        <ProtectedRoute>
+                          <Layout>
+                            <LeavePage />
+                          </Layout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/payroll"
+                      element={
+                        <ProtectedRoute>
+                          <Layout>
+                            <PayrollPage />
                           </Layout>
                         </ProtectedRoute>
                       }

@@ -33,3 +33,6 @@ class User(Base):
     user_widgets = relationship("UserWidget", back_populates="user")
     career_profile = relationship("CareerProfile", back_populates="user", uselist=False)
     user_skills = relationship("UserSkill", back_populates="user")
+    leaves = relationship("Leave", foreign_keys="Leave.user_id", back_populates="user")
+    leave_balances = relationship("LeaveBalance", back_populates="user")
+    payrolls = relationship("Payroll", back_populates="user")

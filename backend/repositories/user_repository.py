@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy.orm import Session
 from models.user import User
 from repositories.base import BaseRepository
@@ -13,6 +13,10 @@ class UserRepository(BaseRepository[User]):
 
     def get_by_email(self, email: str) -> Optional[User]:
         return self.db.query(User).filter(User.email == email).first()
+
+    def get_all(self) -> List[User]:
+        """Get all users"""
+        return self.db.query(User).all()
 
     def create_or_update(self, employee_number: str, email: str, full_name: str, role: str) -> User:
         user = self.get_by_employee_number(employee_number)

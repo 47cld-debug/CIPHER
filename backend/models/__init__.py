@@ -5,6 +5,8 @@ from models.learning import Course, Enrollment, Certificate, Skill, CourseSkill,
 from models.career import Goal, Appraisal, Feedback, CareerProfile
 from models.compliance import Policy, FAQ, Reminder
 from models.wellness import Initiative, Session
+from models.leave import Leave, LeaveBalance
+from models.payroll import Payroll
 
 __all__ = [
     "User",
@@ -26,4 +28,7 @@ __all__ = [
     "Reminder",
     "Initiative",
     "Session",
+    "Leave",
+    "LeaveBalance",
+    "Payroll",
 ]
