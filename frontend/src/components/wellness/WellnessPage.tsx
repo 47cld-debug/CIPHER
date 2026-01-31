@@ -8,9 +8,7 @@ import {
   CardContent,
   CardActionArea,
 } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import EventIcon from '@mui/icons-material/Event';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { Heart, Calendar, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const WellnessPage: React.FC = () => {
@@ -18,62 +16,45 @@ const WellnessPage: React.FC = () => {
 
   return (
     <Box sx={{ width: '100%', maxWidth: '100%' }}>
-      <Paper
-        elevation={0}
-        sx={{
-          background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-          p: 4,
-          mb: 4,
-          borderRadius: 3,
-          border: '1px solid rgba(220, 20, 60, 0.1)',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
-          <Box
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Heart size={24} color="#EF4444" />
+          <Typography
+            variant="h1"
+            component="h1"
             sx={{
-              p: 2,
-              borderRadius: 2,
-              background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
+              fontSize: '26px',
+              fontWeight: 600,
+              color: '#111827',
             }}
           >
-            <FavoriteIcon sx={{ color: 'white', fontSize: { xs: 28, md: 32 } }} />
-          </Box>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography
-              variant="h4"
-              component="h1"
-              sx={{
-                color: '#DC143C',
-                fontWeight: 700,
-                mb: 0.5,
-                letterSpacing: '-0.5px',
-                fontSize: { xs: '1.75rem', md: '2.125rem' },
-              }}
-            >
-              Wellness & Health
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Explore wellness initiatives and book sessions
-            </Typography>
-          </Box>
+            Wellness & Health
+          </Typography>
         </Box>
-      </Paper>
+        <Typography
+          variant="body2"
+          sx={{
+            fontSize: '14px',
+            color: '#6B7280',
+          }}
+        >
+          Explore wellness initiatives and book sessions
+        </Typography>
+      </Box>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Card
             elevation={0}
             sx={{
-              border: '1px solid rgba(220, 20, 60, 0.1)',
-              borderRadius: 3,
-              transition: 'all 0.3s ease',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              backgroundColor: '#FFFFFF',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                boxShadow: 4,
-                borderColor: '#DC143C',
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+                borderColor: '#FCA5A5',
+                backgroundColor: '#FEF2F2',
                 transform: 'translateY(-2px)',
               },
             }}
@@ -83,20 +64,20 @@ const WellnessPage: React.FC = () => {
                 <Box
                   sx={{
                     p: 2,
-                    borderRadius: 2,
-                    background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
+                    borderRadius: '12px',
+                    backgroundColor: '#F9FAFB',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <EventIcon sx={{ color: 'white', fontSize: 28 }} />
+                  <Calendar size={20} color="#6B7280" />
                 </Box>
-                <Typography variant="h5" sx={{ color: '#DC143C', fontWeight: 600 }}>
+                <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 500, color: '#111827' }}>
                   Wellness Initiatives
                 </Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280' }}>
                 View all wellness programs organized by the organization. Daily exercise, yoga, counseling, and more.
               </Typography>
             </CardActionArea>
@@ -107,12 +88,14 @@ const WellnessPage: React.FC = () => {
           <Card
             elevation={0}
             sx={{
-              border: '1px solid rgba(220, 20, 60, 0.1)',
-              borderRadius: 3,
-              transition: 'all 0.3s ease',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              backgroundColor: '#FFFFFF',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                boxShadow: 4,
-                borderColor: '#DC143C',
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+                borderColor: '#FCA5A5',
+                backgroundColor: '#FEF2F2',
                 transform: 'translateY(-2px)',
               },
             }}
@@ -122,20 +105,20 @@ const WellnessPage: React.FC = () => {
                 <Box
                   sx={{
                     p: 2,
-                    borderRadius: 2,
-                    background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
+                    borderRadius: '12px',
+                    backgroundColor: '#F9FAFB',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <CalendarTodayIcon sx={{ color: 'white', fontSize: 28 }} />
+                  <CalendarDays size={20} color="#6B7280" />
                 </Box>
-                <Typography variant="h5" sx={{ color: '#DC143C', fontWeight: 600 }}>
+                <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 500, color: '#111827' }}>
                   My Sessions
                 </Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280' }}>
                 View and manage all sessions you have booked. Cancel bookings if needed.
               </Typography>
             </CardActionArea>

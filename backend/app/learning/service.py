@@ -40,6 +40,11 @@ class LearningService:
 
     def enroll_user(self, user_id: int, course_id: int, auto_enrolled: bool = False) -> Optional[Enrollment]:
         """Enroll user in course"""
+        # Check if course exists
+        course = self.course_repo.get(course_id)
+        if not course:
+            raise ValueError(f"Course with ID {course_id} not found")
+        
         # Check if already enrolled
         existing = self.enrollment_repo.get_by_user_and_course(user_id, course_id)
         if existing:

@@ -9,21 +9,17 @@ interface CourseListProps {
 }
 
 const CourseList: React.FC<CourseListProps> = ({ searchQuery }) => {
-  // Get all available courses
   const { data: courses = [], isLoading: coursesLoading, isError: coursesError, error: coursesErrorObj } = useCourses({
     search: searchQuery || undefined,
   });
   
-  // Get user's enrollments to match with courses
   const { data: enrollments = [] } = useEnrollments();
 
-  // Create a map of course_id -> enrollment for quick lookup
   const enrollmentMap = new Map<number, Enrollment>();
   enrollments.forEach((enrollment) => {
     enrollmentMap.set(enrollment.course_id, enrollment);
   });
 
-  // Filter out completed courses (they're shown in CompletedCoursesSection)
   const activeCourses = courses.filter((course) => {
     const enrollment = enrollmentMap.get(course.id);
     return !enrollment || enrollment.progress_state !== 'COMPLETED';
@@ -32,7 +28,7 @@ const CourseList: React.FC<CourseListProps> = ({ searchQuery }) => {
   if (coursesLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <CircularProgress sx={{ color: '#DC143C' }} />
+        <CircularProgress sx={{ color: '#EF4444' }} />
       </Box>
     );
   }
@@ -44,19 +40,16 @@ const CourseList: React.FC<CourseListProps> = ({ searchQuery }) => {
         sx={{
           textAlign: 'center',
           py: 8,
-          background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-          border: '2px dashed rgba(220, 20, 60, 0.3)',
-          borderRadius: 3,
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
         }}
       >
-        <Typography variant="h6" sx={{ color: '#DC143C', mb: 1, fontWeight: 600 }}>
+        <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 1 }}>
           Error Loading Courses
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280', mb: 2 }}>
           {coursesErrorObj instanceof Error ? coursesErrorObj.message : 'Failed to load courses. Please try again.'}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          If this persists, please contact support.
         </Typography>
       </Paper>
     );
@@ -64,7 +57,7 @@ const CourseList: React.FC<CourseListProps> = ({ searchQuery }) => {
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, mb: 3 }}>
+      <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 3 }}>
         {searchQuery ? 'Search Results' : 'Available Courses'}
       </Typography>
 
@@ -88,15 +81,15 @@ const CourseList: React.FC<CourseListProps> = ({ searchQuery }) => {
           sx={{
             textAlign: 'center',
             py: 8,
-            background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-            border: '2px dashed rgba(220, 20, 60, 0.3)',
-            borderRadius: 3,
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
           }}
         >
-          <Typography variant="h6" sx={{ color: '#DC143C', mb: 1, fontWeight: 600 }}>
+          <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 1 }}>
             {searchQuery ? 'No courses match your search' : 'No courses available'}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280' }}>
             {searchQuery
               ? 'Try a different search term or use the AI chatbot for recommendations'
               : 'Use the search bar or AI chatbot to find and enroll in courses'}

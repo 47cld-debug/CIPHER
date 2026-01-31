@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Container, Paper } from '@mui/material';
+import { Shield } from 'lucide-react';
 import { authApi } from '../../api/auth';
 import { useUI } from '../../contexts/UIContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const OTPVerification: React.FC = () => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { addNotification } = useUI();
@@ -68,140 +70,239 @@ const OTPVerification: React.FC = () => {
       sx={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF6B35 100%)',
-        position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
-        },
+        backgroundColor: '#F9FAFB',
       }}
     >
-      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
-        <Paper
-          elevation={24}
+      {/* Left Section - Illustration/Brand */}
+      <Box
+        sx={{
+          width: '50%',
+          backgroundColor: '#FFFFFF',
+          display: { xs: 'none', md: 'flex' },
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 6,
+        }}
+      >
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Shield size={32} color="#EF4444" />
+          <Typography
+            variant="h4"
+            sx={{
+              fontSize: '32px',
+              fontWeight: 600,
+              color: '#111827',
+            }}
+          >
+            EmpowerX
+          </Typography>
+        </Box>
+        <Typography
+          variant="h5"
           sx={{
-            p: 0,
-            width: '100%',
-            borderRadius: 4,
-            overflow: 'hidden',
-            background: 'white',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+            fontSize: '32px',
+            fontWeight: 600,
+            color: '#111827',
+            mb: 1,
           }}
         >
-          <Box
+          Verify Your Identity
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: '15px',
+            color: '#6B7280',
+            mb: 6,
+          }}
+        >
+          Enter the code sent to your email
+        </Typography>
+        {/* Office Meeting Illustration - GIF */}
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: '500px',
+            height: '400px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            borderRadius: '12px',
+            backgroundColor: '#F9FAFB',
+          }}
+        >
+          {!imageError ? (
+            <img
+              src="/office-meeting.gif"
+              alt="Office meeting illustration"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#F9FAFB',
+                border: '1px dashed #E5E7EB',
+                borderRadius: '12px',
+              }}
+            >
+              <Typography variant="body2" sx={{ color: '#6B7280', textAlign: 'center', px: 2 }}>
+                Place office-meeting.gif in the frontend/public folder
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Box>
+
+      {/* Right Section - OTP Form */}
+      <Box
+        sx={{
+          width: { xs: '100%', md: '50%' },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          p: 4,
+        }}
+      >
+        <Paper
+          elevation={0}
+          sx={{
+            width: '100%',
+            maxWidth: '400px',
+            borderRadius: '16px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
+            p: 4,
+            backgroundColor: '#FFFFFF',
+          }}
+        >
+          <Typography
+            variant="h5"
             sx={{
-              background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
-              p: 4,
+              fontSize: '26px',
+              fontWeight: 600,
+              color: '#111827',
+              mb: 1,
+            }}
+          >
+            Verify OTP
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: '15px',
+              color: '#6B7280',
+              mb: 4,
+            }}
+          >
+            Check your email for the code
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: '14px',
+              color: '#6B7280',
+              mb: 4,
               textAlign: 'center',
             }}
           >
-            <Typography
-              variant="h4"
-              component="h1"
+            We sent a 6-digit code to <strong>{email}</strong>
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              required
+              autoFocus
               sx={{
-                color: 'white',
-                fontWeight: 700,
-                mb: 1,
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  height: '44px',
+                  borderRadius: '10px',
+                  '& fieldset': {
+                    borderColor: '#E5E7EB',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#E5E7EB',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#EF4444',
+                    borderWidth: '1px',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '14px',
+                },
+              }}
+              inputProps={{
+                maxLength: 6,
+                style: {
+                  textAlign: 'center',
+                  fontSize: '32px',
+                  letterSpacing: '12px',
+                  fontWeight: 600,
+                  color: '#111827',
+                },
+              }}
+              placeholder="000000"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={loading || otp.length !== 6}
+              sx={{
+                height: '44px',
+                borderRadius: '10px',
+                backgroundColor: '#EF4444',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: 500,
+                textTransform: 'none',
+                mb: 2,
+                '&:hover': {
+                  backgroundColor: '#DC2626',
+                },
+                '&:disabled': {
+                  backgroundColor: '#D1D5DB',
+                },
               }}
             >
-              Verify OTP
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-              Check your email for the code
-            </Typography>
-          </Box>
-          <Box sx={{ p: 5 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 4, textAlign: 'center' }}>
-              We sent a 6-digit code to <strong>{email}</strong>
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                margin="normal"
-                required
-                autoFocus
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    '&:hover fieldset': {
-                      borderColor: '#DC143C',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#DC143C',
-                    },
-                  },
-                }}
-                inputProps={{
-                  maxLength: 6,
-                  style: {
-                    textAlign: 'center',
-                    fontSize: '32px',
-                    letterSpacing: '12px',
-                    fontWeight: 600,
-                    color: '#DC143C',
-                  },
-                }}
-                placeholder="000000"
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                size="large"
-                sx={{
-                  mt: 4,
-                  mb: 2,
-                  py: 1.5,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, #8B0000 0%, #DC143C 100%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: 4,
-                  },
-                  transition: 'all 0.3s ease',
-                }}
-                disabled={loading || otp.length !== 6}
-              >
-                {loading ? 'Verifying...' : 'Verify & Continue'}
-              </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => navigate('/login')}
-                sx={{
-                  mt: 1,
-                  py: 1.5,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  borderColor: '#DC143C',
-                  color: '#DC143C',
-                  '&:hover': {
-                    borderColor: '#8B0000',
-                    backgroundColor: 'rgba(220, 20, 60, 0.05)',
-                  },
-                }}
-              >
-                Back to Login
-              </Button>
-            </form>
-          </Box>
+              {loading ? 'Verifying...' : 'Verify & Continue'}
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => navigate('/login')}
+              sx={{
+                height: '44px',
+                borderRadius: '10px',
+                textTransform: 'none',
+                fontSize: '14px',
+                fontWeight: 500,
+                borderColor: '#E5E7EB',
+                color: '#111827',
+                '&:hover': {
+                  borderColor: '#EF4444',
+                  backgroundColor: '#FEF2F2',
+                },
+              }}
+            >
+              Back to Login
+            </Button>
+          </form>
         </Paper>
-      </Container>
+      </Box>
     </Box>
   );
 };

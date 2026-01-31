@@ -114,25 +114,95 @@ const AILearningChatbot: React.FC = () => {
 
   const handleCourseClick = async (recommendation: LearningRecommendationResponse) => {
     try {
-      // Auto-enroll user in the course
-      const enrollment = await learningApi.enrollInCourse(recommendation.id, true);
+      let courseId = recommendation.id;
+      let course = null;
+
+      // Try to get course by ID first
+      if (courseId && !isNaN(Number(courseId))) {
+        try {
+          course = await learningApi.getCourse(courseId);
+        } catch (error: any) {
+          // If course not found by ID, try searching by title
+          if (error.response?.status === 404) {
+            console.warn(`Course ID ${courseId} not found, searching by title: ${recommendation.title}`);
+            const courses = await learningApi.getCourses({ search: recommendation.title });
+            if (courses.length > 0) {
+              // Find exact match by title
+              const exactMatch = courses.find(c => c.title.toLowerCase() === recommendation.title.toLowerCase());
+              if (exactMatch) {
+                course = exactMatch;
+                courseId = exactMatch.id;
+              } else {
+                // Use first match if no exact match
+                course = courses[0];
+                courseId = courses[0].id;
+              }
+            }
+          } else {
+            throw error;
+          }
+        }
+      } else {
+        // If no valid ID, search by title
+        const courses = await learningApi.getCourses({ search: recommendation.title });
+        if (courses.length > 0) {
+          const exactMatch = courses.find(c => c.title.toLowerCase() === recommendation.title.toLowerCase());
+          if (exactMatch) {
+            course = exactMatch;
+            courseId = exactMatch.id;
+          } else {
+            course = courses[0];
+            courseId = courses[0].id;
+          }
+        }
+      }
+
+      // If still no course found, show error
+      if (!course || !courseId) {
+        addNotification({
+          id: Date.now().toString(),
+          message: `Course "${recommendation.title}" not found. Please try browsing courses manually.`,
+          type: 'error',
+        });
+        return;
+      }
+
+      // Auto-enroll user in the course (for both INTERNAL and EXTERNAL)
+      const enrollment = await learningApi.enrollInCourse(courseId, true);
+      
+      if (!enrollment) {
+        throw new Error('Enrollment returned null');
+      }
       
       // Get full course details
-      const course = await learningApi.getCourse(recommendation.id);
+      const fullCourse = await learningApi.getCourse(courseId);
       
-      setSelectedCourse(course);
-      setSelectedEnrollmentId(enrollment.id);
-      setProgressModalOpen(true);
-      
-      addNotification({
-        id: Date.now().toString(),
-        message: `Enrolled in ${course.title}`,
-        type: 'success',
-      });
+      // For external courses, open the URL after enrollment
+      if (fullCourse.course_type === 'EXTERNAL' && fullCourse.external_url) {
+        window.open(fullCourse.external_url, '_blank');
+        addNotification({
+          id: Date.now().toString(),
+          message: `Enrolled in ${fullCourse.title}. Opening course...`,
+          type: 'success',
+        });
+      } else {
+        // For internal courses, show progress modal
+        setSelectedCourse(fullCourse);
+        setSelectedEnrollmentId(enrollment.id);
+        setProgressModalOpen(true);
+        
+        addNotification({
+          id: Date.now().toString(),
+          message: `Enrolled in ${fullCourse.title}`,
+          type: 'success',
+        });
+      }
     } catch (error: any) {
+      console.error('Enrollment error:', error);
+      const errorMessage = error.response?.data?.detail || error.message || 'Failed to enroll in course';
       addNotification({
         id: Date.now().toString(),
-        message: error.response?.data?.detail || 'Failed to enroll in course',
+        message: errorMessage,
         type: 'error',
       });
     }
@@ -251,13 +321,20 @@ const AILearningChatbot: React.FC = () => {
                     sx={{
                       p: 1.5,
                       maxWidth: '75%',
-                      bgcolor: message.sender === 'user' ? '#DC143C' : 'white',
-                      color: message.sender === 'user' ? 'white' : 'text.primary',
+                      bgcolor: message.sender === 'user' ? '#EF4444' : 'white',
+                      color: message.sender === 'user' ? '#FFFFFF' : '#111827',
                       borderRadius: 2,
-                      border: message.sender === 'ai' ? '1px solid rgba(220, 20, 60, 0.2)' : 'none',
+                      border: message.sender === 'ai' ? '1px solid #E5E7EB' : 'none',
                     }}
                   >
-                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        whiteSpace: 'pre-wrap',
+                        color: message.sender === 'user' ? '#FFFFFF' : '#111827',
+                        fontWeight: message.sender === 'user' ? 400 : 400,
+                      }}
+                    >
                       {message.text}
                     </Typography>
                   </Paper>
@@ -308,15 +385,15 @@ const AILearningChatbot: React.FC = () => {
                           onClick={() => handleCourseClick(rec)}
                           endIcon={rec.course_type === 'EXTERNAL' ? <LaunchIcon /> : null}
                           sx={{
-                            borderColor: '#DC143C',
-                            color: '#DC143C',
+                            borderColor: '#EF4444',
+                            color: '#EF4444',
                             '&:hover': {
-                              borderColor: '#B0122A',
-                              bgcolor: 'rgba(220, 20, 60, 0.05)',
+                              borderColor: '#DC2626',
+                              bgcolor: '#FEF2F2',
                             },
                           }}
                         >
-                          {rec.course_type === 'EXTERNAL' ? 'Open Course' : 'Start Course'}
+                          {rec.course_type === 'EXTERNAL' ? 'Open Course' : 'Enroll Course'}
                         </Button>
                       </Paper>
                     ))}

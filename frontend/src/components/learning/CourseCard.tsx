@@ -13,7 +13,7 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Trash2 } from 'lucide-react';
 import type { Course, Enrollment } from '../../types/learning';
 import ProgressModal from './ProgressModal';
 import { learningApi } from '../../api/learning';
@@ -37,7 +37,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
     if (enrollment) {
       setProgressModalOpen(true);
     } else {
-      // Auto-enroll silently without showing progress modal
       try {
         const newEnrollment = await learningApi.enrollInCourse(course.id, false);
         addNotification({
@@ -82,17 +81,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
 
   const showDeleteButton = enrollment?.auto_enrolled && enrollment.progress_state === 'NOT_STARTED';
 
-  const getProgressColor = (progress: string) => {
-    const colors: Record<string, string> = {
-      NOT_STARTED: '#9e9e9e',
-      LOW: '#ff9800',
-      MEDIUM: '#ffc107',
-      HIGH: '#4caf50',
-      COMPLETED: '#2196f3',
-    };
-    return colors[progress] || '#9e9e9e';
-  };
-
   return (
     <>
       <Card
@@ -101,25 +89,19 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
           display: 'flex',
           flexDirection: 'column',
           cursor: 'pointer',
-          borderRadius: 3,
-          border: '1px solid rgba(220, 20, 60, 0.1)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          borderRadius: '12px',
+          border: '1px solid #E5E7EB',
+          backgroundColor: '#FFFFFF',
+          transition: 'all 0.2s ease',
           '&:hover': {
-            transform: 'translateY(-8px)',
-            boxShadow: '0 12px 24px rgba(220, 20, 60, 0.15)',
-            borderColor: '#DC143C',
+            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+            borderColor: '#FCA5A5',
+            backgroundColor: '#FEF2F2',
+            transform: 'translateY(-2px)',
           },
         }}
         onClick={handleCardClick}
       >
-        <Box
-          sx={{
-            height: 4,
-            background: course.course_type === 'INTERNAL'
-              ? 'linear-gradient(90deg, #DC143C 0%, #FF6B35 100%)'
-              : 'linear-gradient(90deg, #FF6B35 0%, #FF8C42 100%)',
-          }}
-        />
         <CardContent sx={{ flexGrow: 1, p: 3, position: 'relative' }}>
           {showDeleteButton && (
             <IconButton
@@ -132,83 +114,81 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
                 position: 'absolute',
                 top: 8,
                 right: 8,
-                color: '#f44336',
+                color: '#6B7280',
                 '&:hover': {
-                  bgcolor: 'rgba(244, 67, 54, 0.1)',
+                  backgroundColor: '#F9FAFB',
                 },
               }}
             >
-              <DeleteIcon fontSize="small" />
+              <Trash2 size={16} />
             </IconButton>
           )}
+          
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
             <Typography
-              variant="h6"
+              variant="h3"
               component="h2"
               sx={{
-                color: '#DC143C',
-                fontWeight: 600,
-                fontSize: '1.1rem',
-                lineHeight: 1.3,
+                fontSize: '16px',
+                fontWeight: 500,
+                color: '#111827',
                 flex: 1,
                 mr: 1,
               }}
             >
               {course.title}
             </Typography>
-            <Chip
-              label={course.course_type}
-              size="small"
-              sx={{
-                backgroundColor: course.course_type === 'INTERNAL' ? 'rgba(220, 20, 60, 0.1)' : 'rgba(255, 107, 53, 0.1)',
-                color: course.course_type === 'INTERNAL' ? '#DC143C' : '#FF6B35',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-              }}
-            />
+            {course.course_type === 'EXTERNAL' && (
+              <Chip
+                label="EXTERNAL"
+                size="small"
+                sx={{
+                  backgroundColor: '#FEF2F2',
+                  color: '#EF4444',
+                  fontWeight: 500,
+                  fontSize: '11px',
+                  padding: '4px 8px',
+                  borderRadius: '999px',
+                  height: 'auto',
+                }}
+              />
+            )}
           </Box>
+
           {course.provider_name && (
-            <Box
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                mb: 2,
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 1,
-                backgroundColor: 'rgba(220, 20, 60, 0.05)',
-              }}
-            >
-              <Typography variant="caption" sx={{ color: '#DC143C', fontWeight: 500 }}>
-                {course.provider_name}
-              </Typography>
-            </Box>
+            <Typography variant="caption" sx={{ fontSize: '12px', color: '#6B7280', display: 'block', mb: 2 }}>
+              {course.provider_name}
+            </Typography>
           )}
+
           <Typography
             variant="body2"
-            color="text.secondary"
             sx={{
+              fontSize: '14px',
+              color: '#6B7280',
               mb: 2,
               lineHeight: 1.6,
               display: '-webkit-box',
-              WebkitLineClamp: 3,
+              WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
             }}
           >
             {course.description || 'No description available'}
           </Typography>
+
           {enrollment && (
             <Box sx={{ mt: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                <Typography variant="caption" sx={{ fontSize: '12px', color: '#6B7280', fontWeight: 400 }}>
                   Progress
                 </Typography>
                 <Typography
                   variant="caption"
                   sx={{
-                    color: getProgressColor(enrollment.progress_state),
-                    fontWeight: 600,
+                    fontSize: '12px',
+                    color: '#111827',
+                    fontWeight: 400,
                     textTransform: 'capitalize',
                   }}
                 >
@@ -218,8 +198,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
               <Box
                 sx={{
                   height: 6,
-                  borderRadius: 3,
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                  borderRadius: '999px',
+                  backgroundColor: '#E5E7EB',
                   overflow: 'hidden',
                 }}
               >
@@ -227,8 +207,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
                   sx={{
                     height: '100%',
                     width: `${(enrollment.progress_state === 'COMPLETED' ? 100 : enrollment.progress_state === 'HIGH' ? 85 : enrollment.progress_state === 'MEDIUM' ? 50 : enrollment.progress_state === 'LOW' ? 15 : 0)}%`,
-                    background: `linear-gradient(90deg, ${getProgressColor(enrollment.progress_state)} 0%, ${getProgressColor(enrollment.progress_state)}dd 100%)`,
-                    transition: 'width 0.5s ease',
+                    backgroundColor: '#EF4444',
+                    transition: 'width 0.3s ease',
                   }}
                 />
               </Box>
@@ -242,12 +222,14 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
               variant="contained"
               fullWidth
               sx={{
-                borderRadius: 2,
+                borderRadius: '10px',
                 textTransform: 'none',
-                fontWeight: 600,
-                background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '44px',
+                backgroundColor: '#EF4444',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #8B0000 0%, #DC143C 100%)',
+                  backgroundColor: '#DC2626',
                 },
               }}
             >
@@ -259,14 +241,16 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
               variant="outlined"
               fullWidth
               sx={{
-                borderRadius: 2,
+                borderRadius: '10px',
                 textTransform: 'none',
-                fontWeight: 600,
-                borderColor: '#DC143C',
-                color: '#DC143C',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '44px',
+                borderColor: '#E5E7EB',
+                color: '#111827',
                 '&:hover': {
-                  borderColor: '#8B0000',
-                  backgroundColor: 'rgba(220, 20, 60, 0.05)',
+                  borderColor: '#EF4444',
+                  backgroundColor: '#FEF2F2',
                 },
               }}
             >
@@ -290,25 +274,25 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
       )}
 
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle sx={{ color: '#DC143C', fontWeight: 600 }}>
+        <DialogTitle sx={{ fontSize: '18px', fontWeight: 600, color: '#111827' }}>
           Remove Course
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body1">
+          <Typography variant="body1" sx={{ fontSize: '14px', color: '#111827' }}>
             Are you sure you want to remove "{course.title}" from your learning profile?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} sx={{ color: '#666' }}>
+          <Button onClick={() => setDeleteDialogOpen(false)} sx={{ fontSize: '14px', color: '#6B7280' }}>
             Cancel
           </Button>
           <Button
             onClick={handleDelete}
             variant="contained"
             sx={{
-              bgcolor: '#f44336',
+              backgroundColor: '#EF4444',
               '&:hover': {
-                bgcolor: '#d32f2f',
+                backgroundColor: '#DC2626',
               },
             }}
           >

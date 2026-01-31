@@ -1,6 +1,6 @@
-# AI-Powered Employee Self-Service Portal
+# EmpowerX - AI-Powered Employee Self-Service Platform
 
-A production-quality employee portal platform with OTP-based authentication, learning management, career growth tracking, compliance, wellness, and AI assistance.
+A production-quality EmpowerX platform with OTP-based authentication, learning management, career growth tracking, compliance, wellness, and AI assistance.
 
 ## Features
 

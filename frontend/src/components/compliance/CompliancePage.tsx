@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Grid,
   Card,
-  CardContent,
   CircularProgress,
   TextField,
   Accordion,
@@ -14,10 +12,9 @@ import {
   Chip,
   Tabs,
   Tab,
+  Button,
 } from '@mui/material';
-import GavelIcon from '@mui/icons-material/Gavel';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
+import { Scale, ChevronDown, Bot, Search } from 'lucide-react';
 import { usePolicies, useFAQs, useReminders } from '../../hooks/useApi';
 import { useAuth } from '../../contexts/AuthContext';
 import ComplianceUploadPanel from './ComplianceUploadPanel';
@@ -25,23 +22,30 @@ import ComplianceChat from './ComplianceChat';
 
 const CompliancePage: React.FC = () => {
   const [search, setSearch] = useState('');
-  const [faqCategory, setFaqCategory] = useState<string>('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [tab, setTab] = useState(0);
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
 
-  const { data: policies = [], isLoading: policiesLoading, isError: policiesError, error: policiesErrorData } = usePolicies(search || undefined);
-  const { data: faqs = [], isLoading: faqsLoading, isError: faqsError, error: faqsErrorData } = useFAQs(faqCategory || undefined);
-  const { data: reminders = [], isLoading: remindersLoading, isError: remindersError, error: remindersErrorData } = useReminders();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data: policies = [], isLoading: policiesLoading, isError: policiesError } = usePolicies(debouncedSearch || undefined);
+  const { data: faqs = [], isLoading: faqsLoading, isError: faqsError } = useFAQs();
+  const { isLoading: remindersLoading } = useReminders();
 
   const isLoading = policiesLoading || faqsLoading || remindersLoading;
-  const hasError = policiesError || faqsError || remindersError;
+  const hasError = policiesError || faqsError;
 
   if (isLoading) {
     return (
       <Box sx={{ width: '100%', maxWidth: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-          <CircularProgress sx={{ color: '#DC143C' }} />
+          <CircularProgress sx={{ color: '#EF4444' }} />
         </Box>
       </Box>
     );
@@ -50,329 +54,284 @@ const CompliancePage: React.FC = () => {
   if (hasError) {
     return (
       <Box sx={{ width: '100%', maxWidth: '100%' }}>
-        <Paper
-          elevation={0}
+        <Card
           sx={{
             textAlign: 'center',
             py: 8,
-            background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-            border: '2px dashed rgba(220, 20, 60, 0.3)',
-            borderRadius: 3,
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
           }}
         >
-          <Typography variant="h6" sx={{ color: '#DC143C', mb: 1, fontWeight: 600 }}>
+          <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 1 }}>
             Error Loading Compliance Data
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {(policiesErrorData || faqsErrorData || remindersErrorData) instanceof Error
-              ? (policiesErrorData || faqsErrorData || remindersErrorData)?.message
-              : 'Failed to load compliance information. Please try again.'}
+          <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280', mb: 2 }}>
+            Failed to load compliance information. Please try again.
           </Typography>
-        </Paper>
+        </Card>
       </Box>
     );
   }
 
   return (
     <Box sx={{ width: '100%', maxWidth: '100%' }}>
-      <Paper
-        elevation={0}
-        sx={{
-          background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-          p: { xs: 2.5, sm: 3, md: 4 },
-          mb: { xs: 3, md: 4 },
-          borderRadius: 3,
-          border: '1px solid rgba(220, 20, 60, 0.1)',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
-          <Box
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Scale size={24} color="#EF4444" />
+          <Typography
+            variant="h1"
+            component="h1"
             sx={{
-              p: 2,
-              borderRadius: 2,
-              background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
+              fontSize: '26px',
+              fontWeight: 600,
+              color: '#111827',
             }}
           >
-            <GavelIcon sx={{ color: 'white', fontSize: { xs: 28, md: 32 } }} />
-          </Box>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography
-              variant="h4"
-              component="h1"
-              sx={{
-                color: '#DC143C',
-                fontWeight: 700,
-                mb: 0.5,
-                letterSpacing: '-0.5px',
-                fontSize: { xs: '1.75rem', md: '2.125rem' },
-              }}
-            >
-              Compliance & Policies
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Access policies, FAQs, and compliance reminders
-            </Typography>
-          </Box>
+            Compliance & Policies
+          </Typography>
         </Box>
-      </Paper>
+        <Typography
+          variant="body2"
+          sx={{
+            fontSize: '14px',
+            color: '#6B7280',
+          }}
+        >
+          Access company policies and FAQs
+        </Typography>
+      </Box>
 
-      <Paper
-        elevation={0}
-        sx={{
-          mb: 3,
-          borderRadius: 3,
-          border: '1px solid rgba(220, 20, 60, 0.1)',
-          overflow: 'hidden',
-        }}
-      >
+      {/* Tabs */}
+      <Box sx={{ mb: 3 }}>
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
           sx={{
-            borderBottom: '1px solid rgba(220, 20, 60, 0.1)',
-            '& .MuiTab-root': { fontWeight: 600 },
-            '& .Mui-selected': { color: '#DC143C' },
-            '& .MuiTabs-indicator': { backgroundColor: '#DC143C' },
+            borderBottom: '1px solid #E5E7EB',
+            '& .MuiTab-root': { fontWeight: 500, fontSize: '14px', color: '#6B7280', textTransform: 'none' },
+            '& .Mui-selected': { color: '#EF4444' },
+            '& .MuiTabs-indicator': { backgroundColor: '#EF4444', height: '2px' },
           }}
         >
-          <Tab icon={<SmartToyIcon />} iconPosition="start" label="AI Assistant" />
+          <Tab icon={<Bot size={20} />} iconPosition="start" label="AI Assistant" />
           <Tab label="Policies & FAQs" />
         </Tabs>
-        <Box sx={{ p: 3 }}>
-          {tab === 0 && (
-            isAdmin ? (
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                  <ComplianceUploadPanel />
-                </Grid>
-                <Grid item xs={12} md={8}>
-                  <ComplianceChat embedded />
-                </Grid>
-              </Grid>
-            ) : (
-              <ComplianceChat embedded={false} />
-            )
-          )}
-          {tab === 1 && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: '1px solid rgba(220, 20, 60, 0.1)',
-              mb: 3,
-            }}
-          >
-            <TextField
-              fullWidth
-              label="Search Policies"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  '&:hover fieldset': {
-                    borderColor: '#DC143C',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#DC143C',
-                  },
-                },
-              }}
-              placeholder="Search by title or content..."
-            />
-          </Paper>
+      </Box>
 
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: '1px solid rgba(220, 20, 60, 0.1)',
-            }}
-          >
-            <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, mb: 3 }}>
-              Policies
-            </Typography>
-            {policies.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography variant="body2" color="text.secondary">
-                  No policies found
-                </Typography>
-              </Box>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {policies.map((policy) => (
-                  <Card
-                    key={policy.id}
-                    sx={{
-                      border: '1px solid rgba(220, 20, 60, 0.1)',
-                      borderRadius: 2,
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        boxShadow: 4,
-                        borderColor: '#DC143C',
-                      },
-                    }}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
-                        <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, fontSize: '1rem' }}>
+      {/* Tab Content */}
+      {tab === 0 && (
+        isAdmin ? (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <ComplianceUploadPanel />
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <ComplianceChat embedded />
+            </Grid>
+          </Grid>
+        ) : (
+          <ComplianceChat embedded={false} />
+        )
+      )}
+
+      {tab === 1 && (
+        <Grid container spacing={3}>
+          {/* Left Column - Policies */}
+          <Grid item xs={12} md={6}>
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                placeholder="Search policies..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                      <Search size={20} color="#6B7280" />
+                    </Box>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    height: '44px',
+                    borderRadius: '999px',
+                    border: '1px solid #E5E7EB',
+                    '&:hover fieldset': {
+                      borderColor: '#E5E7EB',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#EF4444',
+                    },
+                  },
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 3 }}>
+                Policies
+              </Typography>
+              {policies.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280' }}>
+                    No policies found
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {policies.map((policy) => (
+                    <Card
+                      key={policy.id}
+                      sx={{
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+                          borderColor: '#FCA5A5',
+                          backgroundColor: '#FEF2F2',
+                          transform: 'translateY(-2px)',
+                        },
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                        <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 500, color: '#111827' }}>
                           {policy.title}
                         </Typography>
                         {policy.version && (
-                          <Chip label={`v${policy.version}`} size="small" sx={{ backgroundColor: 'rgba(220, 20, 60, 0.1)', color: '#DC143C' }} />
-                        )}
-                      </Box>
-                      {policy.category && (
-                        <Chip
-                          label={policy.category}
-                          size="small"
-                          sx={{ mb: 1, backgroundColor: 'rgba(255, 107, 53, 0.1)', color: '#FF6B35' }}
-                        />
-                      )}
-                      {policy.content && (
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                          {policy.content.length > 150 ? `${policy.content.substring(0, 150)}...` : policy.content}
-                        </Typography>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </Box>
-            )}
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: '1px solid rgba(220, 20, 60, 0.1)',
-              mb: 3,
-            }}
-          >
-            <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, mb: 2 }}>
-              Reminders
-            </Typography>
-            {reminders.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  No pending reminders
-                </Typography>
-              </Box>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                {reminders.map((reminder) => (
-                  <Card
-                    key={reminder.id}
-                    sx={{
-                      border: reminder.completed ? '1px solid rgba(76, 175, 80, 0.3)' : '1px solid rgba(220, 20, 60, 0.3)',
-                      borderRadius: 2,
-                      backgroundColor: reminder.completed ? 'rgba(76, 175, 80, 0.05)' : 'rgba(220, 20, 60, 0.05)',
-                    }}
-                  >
-                    <CardContent sx={{ py: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                            {reminder.type}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {reminder.message}
-                          </Typography>
-                          {reminder.due_date && (
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                              Due: {new Date(reminder.due_date).toLocaleDateString()}
-                            </Typography>
-                          )}
-                        </Box>
-                        <Chip
-                          label={reminder.completed ? 'Completed' : 'Pending'}
-                          size="small"
-                          sx={{
-                            backgroundColor: reminder.completed ? '#4caf50' : '#ff9800',
-                            color: 'white',
-                            fontWeight: 600,
-                          }}
-                        />
-                      </Box>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Box>
-            )}
-          </Paper>
-
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: '1px solid rgba(220, 20, 60, 0.1)',
-            }}
-          >
-            <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, mb: 3 }}>
-              Frequently Asked Questions
-            </Typography>
-            {faqs.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography variant="body2" color="text.secondary">
-                  No FAQs available
-                </Typography>
-              </Box>
-            ) : (
-              <Box>
-                {faqs.map((faq) => (
-                  <Accordion
-                    key={faq.id}
-                    sx={{
-                      mb: 1,
-                      borderRadius: 2,
-                      '&:before': { display: 'none' },
-                      border: '1px solid rgba(220, 20, 60, 0.1)',
-                      '&:hover': {
-                        borderColor: '#DC143C',
-                      },
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#DC143C' }} />}>
-                      <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#DC143C' }}>
-                          {faq.question}
-                        </Typography>
-                        {faq.category && (
                           <Chip
-                            label={faq.category}
+                            label={`v${policy.version}`}
                             size="small"
-                            sx={{ mt: 1, backgroundColor: 'rgba(255, 107, 53, 0.1)', color: '#FF6B35' }}
+                            sx={{
+                              backgroundColor: '#F3F4F6',
+                              color: '#111827',
+                              fontSize: '11px',
+                              borderRadius: '999px',
+                              height: 'auto',
+                              padding: '4px 8px',
+                            }}
                           />
                         )}
                       </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2" color="text.secondary">
-                        {faq.answer}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-              </Box>
-            )}
-          </Paper>
+                      {policy.content && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: '14px',
+                            color: '#6B7280',
+                            mb: 2,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {policy.content}
+                        </Typography>
+                      )}
+                      <Button
+                        variant="outlined"
+                        sx={{
+                          borderColor: '#E5E7EB',
+                          color: '#111827',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          textTransform: 'none',
+                          '&:hover': {
+                            borderColor: '#EF4444',
+                            backgroundColor: '#FEF2F2',
+                          },
+                        }}
+                      >
+                        View
+                      </Button>
+                    </Card>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          </Grid>
+
+          {/* Right Column - FAQs */}
+          <Grid item xs={12} md={6}>
+            <Box>
+              <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 3 }}>
+                Frequently Asked Questions
+              </Typography>
+              {faqs.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280' }}>
+                    No FAQs available
+                  </Typography>
+                </Box>
+              ) : (
+                <Box>
+                  {faqs.map((faq) => (
+                    <Accordion
+                      key={faq.id}
+                      defaultExpanded={false}
+                      sx={{
+                        mb: 2,
+                        borderRadius: '12px',
+                        border: '1px solid #E5E7EB',
+                        backgroundColor: '#FFFFFF',
+                        transition: 'all 0.2s ease',
+                        '&:before': { display: 'none' },
+                        '&.Mui-expanded': {
+                          margin: '0 0 16px 0',
+                        },
+                        '&:hover': {
+                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+                          borderColor: '#FCA5A5',
+                          backgroundColor: '#FEF2F2',
+                        },
+                      }}
+                    >
+                      <AccordionSummary
+                        expandIcon={<ChevronDown size={16} color="#6B7280" />}
+                        sx={{
+                          '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+                            transform: 'rotate(180deg)',
+                          },
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="subtitle1" sx={{ fontSize: '14px', fontWeight: 500, color: '#111827', mb: 1 }}>
+                            {faq.question}
+                          </Typography>
+                          {faq.category && (
+                            <Chip
+                              label={faq.category}
+                              size="small"
+                              sx={{
+                                backgroundColor: '#F3F4F6',
+                                color: '#111827',
+                                fontSize: '11px',
+                                borderRadius: '999px',
+                                height: 'auto',
+                                padding: '4px 8px',
+                              }}
+                            />
+                          )}
+                        </Box>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280' }}>
+                          {faq.answer}
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          </Grid>
         </Grid>
-            </Grid>
-          )}
-        </Box>
-      </Paper>
+      )}
     </Box>
   );
 };

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Container, Paper } from '@mui/material';
+import { Briefcase } from 'lucide-react';
 import { authApi } from '../../api/auth';
 import { useUI } from '../../contexts/UIContext';
 
 const LoginForm: React.FC = () => {
   const [employeeNumber, setEmployeeNumber] = useState('');
   const [loading, setLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
   const { addNotification } = useUI();
 
@@ -42,115 +44,208 @@ const LoginForm: React.FC = () => {
       sx={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF6B35 100%)',
-        position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
-        },
+        backgroundColor: '#F9FAFB',
       }}
     >
-      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
-        <Paper
-          elevation={24}
-          sx={{
-            p: 0,
-            width: '100%',
-            borderRadius: 4,
-            overflow: 'hidden',
-            background: 'white',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-          }}
-        >
-          <Box
+      {/* Left Section - Illustration/Brand */}
+      <Box
+        sx={{
+          width: '50%',
+          backgroundColor: '#FFFFFF',
+          display: { xs: 'none', md: 'flex' },
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 6,
+        }}
+      >
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Briefcase size={32} color="#EF4444" />
+          <Typography
+            variant="h4"
             sx={{
-              background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
-              p: 4,
-              textAlign: 'center',
+              fontSize: '32px',
+              fontWeight: 600,
+              color: '#111827',
             }}
           >
-            <Typography
-              variant="h3"
-              component="h1"
+            EmpowerX
+          </Typography>
+        </Box>
+        <Typography
+          variant="h5"
+          sx={{
+            fontSize: '32px',
+            fontWeight: 600,
+            color: '#111827',
+            mb: 1,
+          }}
+        >
+          Welcome Back
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: '15px',
+            color: '#6B7280',
+            mb: 6,
+          }}
+        >
+          Sign in to access your account
+        </Typography>
+        {/* Office Meeting Illustration - GIF */}
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: '500px',
+            height: '400px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            borderRadius: '12px',
+            backgroundColor: '#F9FAFB',
+          }}
+        >
+          {!imageError ? (
+            <img
+              src="/office-meeting.gif"
+              alt="Office meeting illustration"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <Box
               sx={{
-                color: 'white',
-                fontWeight: 700,
-                mb: 1,
-                letterSpacing: '-0.5px',
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#F9FAFB',
+                border: '1px dashed #E5E7EB',
+                borderRadius: '12px',
               }}
             >
-              Employee Portal
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-              Welcome back
-            </Typography>
-          </Box>
-          <Box sx={{ p: 5 }}>
-            <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, mb: 1 }}>
-              Sign In
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-              Enter your employee number to receive a one-time password
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label="Employee Number"
-                value={employeeNumber}
-                onChange={(e) => setEmployeeNumber(e.target.value.toUpperCase())}
-                margin="normal"
-                required
-                autoFocus
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    '&:hover fieldset': {
-                      borderColor: '#DC143C',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#DC143C',
-                    },
+              <Typography variant="body2" sx={{ color: '#6B7280', textAlign: 'center', px: 2 }}>
+                Place office-meeting.gif in the frontend/public folder
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Box>
+
+      {/* Right Section - Login Form */}
+      <Box
+        sx={{
+          width: { xs: '100%', md: '50%' },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          p: 4,
+        }}
+      >
+        <Paper
+          elevation={0}
+          sx={{
+            width: '100%',
+            maxWidth: '400px',
+            borderRadius: '16px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
+            p: 4,
+            backgroundColor: '#FFFFFF',
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              fontSize: '26px',
+              fontWeight: 600,
+              color: '#111827',
+              mb: 1,
+            }}
+          >
+            Sign In
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: '15px',
+              color: '#6B7280',
+              mb: 4,
+            }}
+          >
+            Enter your employee number to sign in
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Employee Number"
+              value={employeeNumber}
+              onChange={(e) => setEmployeeNumber(e.target.value.toUpperCase())}
+              required
+              autoFocus
+              placeholder="e.g., EMP001"
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  height: '44px',
+                  borderRadius: '10px',
+                  '& fieldset': {
+                    borderColor: '#E5E7EB',
                   },
-                }}
-                placeholder="e.g., EMP001"
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                size="large"
-                sx={{
-                  mt: 4,
-                  mb: 2,
-                  py: 1.5,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, #8B0000 0%, #DC143C 100%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: 4,
+                  '&:hover fieldset': {
+                    borderColor: '#E5E7EB',
                   },
-                  transition: 'all 0.3s ease',
-                }}
-                disabled={loading}
-              >
-                {loading ? 'Sending OTP...' : 'Continue'}
-              </Button>
-            </form>
-          </Box>
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#EF4444',
+                    borderWidth: '1px',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '14px',
+                },
+                '& .MuiOutlinedInput-input': {
+                  fontSize: '14px',
+                  padding: '0 14px',
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <Box sx={{ mr: 1, color: '#6B7280' }}>
+                    #
+                  </Box>
+                ),
+              }}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={loading}
+              sx={{
+                height: '44px',
+                borderRadius: '10px',
+                backgroundColor: '#EF4444',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: 500,
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#DC2626',
+                },
+                '&:disabled': {
+                  backgroundColor: '#D1D5DB',
+                },
+              }}
+            >
+              {loading ? 'Sending OTP...' : 'Continue'}
+            </Button>
+          </form>
         </Paper>
-      </Container>
+      </Box>
     </Box>
   );
 };

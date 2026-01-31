@@ -1,76 +1,96 @@
 import { createTheme } from '@mui/material/styles';
-import { g10xColors, gradients } from './palette';
+import { designSystemColors, g10xColors } from './palette';
 
 export const theme = createTheme({
   palette: {
     primary: {
-      main: g10xColors.red.main,
-      dark: g10xColors.red.dark,
-    },
-    secondary: {
-      main: g10xColors.orange.main,
-      light: g10xColors.orange.light,
+      main: designSystemColors.accent.primary,
+      dark: designSystemColors.accent.hover,
     },
     background: {
-      default: g10xColors.white,
-      paper: g10xColors.white,
+      default: designSystemColors.background,
+      paper: designSystemColors.surface,
     },
     text: {
-      primary: g10xColors.black,
-      secondary: g10xColors.gray.main,
+      primary: designSystemColors.text.primary,
+      secondary: designSystemColors.text.secondary,
     },
+    divider: designSystemColors.divider,
   },
   typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
+    fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
     h1: {
-      fontWeight: 700,
-      color: g10xColors.red.main,
+      fontSize: '26px',
+      fontWeight: 600,
+      lineHeight: 1.25,
+      color: designSystemColors.text.primary,
     },
     h2: {
-      fontWeight: 700,
-      color: g10xColors.red.main,
+      fontSize: '18px',
+      fontWeight: 600,
+      lineHeight: 1.25,
+      color: designSystemColors.text.primary,
     },
     h3: {
-      fontWeight: 600,
-      color: g10xColors.orange.main,
+      fontSize: '16px',
+      fontWeight: 500,
+      lineHeight: 1.25,
+      color: designSystemColors.text.primary,
     },
     h4: {
-      fontWeight: 600,
-      color: g10xColors.orange.main,
+      fontSize: '16px',
+      fontWeight: 500,
+      lineHeight: 1.25,
+      color: designSystemColors.text.primary,
+    },
+    body1: {
+      fontSize: '14px',
+      fontWeight: 400,
+      lineHeight: 1.6,
+      color: designSystemColors.text.primary,
+    },
+    body2: {
+      fontSize: '14px',
+      fontWeight: 400,
+      lineHeight: 1.6,
+      color: designSystemColors.text.secondary,
+    },
+    caption: {
+      fontSize: '12px',
+      fontWeight: 400,
+      lineHeight: 1.6,
+      color: designSystemColors.text.secondary,
     },
     button: {
       textTransform: 'none',
-      fontWeight: 600,
+      fontWeight: 500,
+      fontSize: '14px',
     },
   },
+  spacing: 8,
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          padding: '10px 24px',
+          borderRadius: 10,
+          height: '44px',
+          padding: '0 24px',
+          fontSize: '14px',
+          fontWeight: 500,
         },
         contained: {
-          background: gradients.redToOrange,
-          color: g10xColors.white,
+          background: designSystemColors.accent.primary,
+          color: designSystemColors.surface,
           '&:hover': {
-            background: gradients.darkRedToOrange,
+            background: designSystemColors.accent.hover,
           },
         },
         outlined: {
-          borderColor: g10xColors.red.main,
-          color: g10xColors.red.main,
+          borderColor: designSystemColors.border,
+          color: designSystemColors.text.primary,
           '&:hover': {
-            borderColor: g10xColors.red.dark,
-            backgroundColor: g10xColors.gray.light,
+            borderColor: designSystemColors.accent.primary,
+            backgroundColor: designSystemColors.accent.soft,
           },
         },
       },
@@ -79,7 +99,36 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: `1px solid ${designSystemColors.border}`,
+          boxShadow: 'none',
+          padding: '20px',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 10,
+            height: '44px',
+            '& fieldset': {
+              borderColor: designSystemColors.border,
+            },
+            '&:hover fieldset': {
+              borderColor: designSystemColors.border,
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: designSystemColors.accent.primary,
+            },
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          border: `1px solid ${designSystemColors.border}`,
         },
       },
     },

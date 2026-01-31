@@ -53,6 +53,7 @@ export const useUploadCertificate = () => {
       learningApi.uploadCertificate(enrollmentId, file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+      queryClient.invalidateQueries({ queryKey: ['pendingCertificates'] });
     },
   });
 };

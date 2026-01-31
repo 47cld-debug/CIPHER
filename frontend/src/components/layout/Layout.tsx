@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f5f5f5', width: '100%', overflowX: 'hidden' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F9FAFB', width: '100%', overflowX: 'hidden' }}>
       <Navbar />
       <Sidebar />
       <Box
@@ -22,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         sx={{
           flexGrow: 1,
           width: '100%',
-          p: { xs: 2, sm: 2.5, md: 3, lg: 4 },
+          p: 4,
           marginTop: '64px',
           minHeight: 'calc(100vh - 64px)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

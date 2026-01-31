@@ -139,29 +139,35 @@ class OpenAIService:
             return matched[:3] if matched else available_courses[:3]
 
         try:
-            # Build course context
+            # Build course context with explicit IDs
             course_context = "\n".join([
-                f"- {c.get('title', '')}: {c.get('description', '')[:100]} (Type: {c.get('course_type', '')}, Category: {c.get('category', '')})"
+                f"ID: {c.get('id')} - {c.get('title', '')}: {c.get('description', '')[:100]} (Type: {c.get('course_type', '')}, Category: {c.get('category', '')})"
                 for c in available_courses[:20]
             ])
+            
+            # Create a mapping of course IDs for validation
+            valid_course_ids = {c.get('id') for c in available_courses}
+            course_id_map = {c.get('id'): c for c in available_courses}
             
             prompt = f"""
             The user has a project or learning need: "{user_query}"
             
-            Available courses:
+            Available courses (YOU MUST USE ONLY THESE IDs):
             {course_context}
             
-            Based on the user's project description, recommend 3-5 most relevant courses.
+            IMPORTANT: You MUST use ONLY the course IDs listed above. Do not create or invent new IDs.
+            
+            Based on the user's project description, recommend 3-5 most relevant courses from the list above.
             Understand what skills/knowledge they need and match courses accordingly.
             
-            Return a JSON array with this structure:
+            Return a JSON array with this EXACT structure (use the IDs from the list above):
             [
                 {{
-                    "id": <course_id>,
-                    "title": "<course_title>",
-                    "description": "<why this course is relevant>",
-                    "course_type": "<INTERNAL or EXTERNAL>",
-                    "external_url": "<url if external>"
+                    "id": <course_id_from_list_above>,
+                    "title": "<exact_course_title_from_list>",
+                    "description": "<why this course is relevant to the user's project>",
+                    "course_type": "<INTERNAL or EXTERNAL from list>",
+                    "external_url": "<url if external, null otherwise>"
                 }}
             ]
             """
@@ -169,7 +175,7 @@ class OpenAIService:
             response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a learning advisor. Return only valid JSON."},
+                    {"role": "system", "content": "You are a learning advisor. You MUST return only valid JSON with course IDs that exist in the provided list. Never invent or create new course IDs."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7
@@ -187,8 +193,36 @@ class OpenAIService:
                     content = content.split("```")[1].split("```")[0].strip()
                 
                 recommendations = json.loads(content)
-                # Validate and return
-                return recommendations[:5]
+                
+                # Validate and filter recommendations - only return courses with valid IDs
+                validated_recommendations = []
+                for rec in recommendations:
+                    rec_id = rec.get('id')
+                    # Convert to int if it's a string, and check if it exists
+                    try:
+                        rec_id_int = int(rec_id) if rec_id is not None else None
+                    except (ValueError, TypeError):
+                        logger.warning(f"AI returned invalid course ID (not a number): {rec_id}, skipping")
+                        continue
+                    
+                    if rec_id_int is not None and rec_id_int in valid_course_ids:
+                        # Use the actual course data to ensure accuracy
+                        original_course = course_id_map[rec_id_int]
+                        validated_recommendations.append({
+                            "id": rec_id_int,
+                            "title": original_course.get('title'),
+                            "description": rec.get('description', original_course.get('description', '')),  # Use AI description but keep original title
+                            "course_type": original_course.get('course_type'),
+                            "external_url": original_course.get('external_url')
+                        })
+                    else:
+                        logger.warning(f"AI returned invalid course ID: {rec_id_int} (not in available courses), skipping. Available IDs: {sorted(list(valid_course_ids))[:10]}")
+                
+                if not validated_recommendations:
+                    logger.warning("All AI recommendations had invalid IDs, falling back to mock recommendations")
+                    return self._get_mock_rag_recommendations(user_query, available_courses)
+                
+                return validated_recommendations[:5]
             except json.JSONDecodeError:
                 logger.error(f"Failed to parse JSON: {content}")
                 return self._get_mock_rag_recommendations(user_query, available_courses)

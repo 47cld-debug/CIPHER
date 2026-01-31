@@ -60,7 +60,7 @@ def create_course(
 ):
     """Create a new course"""
     service = AdminService(db)
-    course = service.create_course(request.dict())
+    course = service.create_course(request.model_dump(exclude_unset=True))
     return course
 
 
@@ -73,7 +73,7 @@ def update_course(
 ):
     """Update a course"""
     service = AdminService(db)
-    course_data = {k: v for k, v in request.dict().items() if v is not None}
+    course_data = request.model_dump(exclude_unset=True)
     course = service.update_course(course_id, course_data)
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")

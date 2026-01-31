@@ -1,13 +1,22 @@
 :root {
-  /* G10X Color Palette */
-  --g10x-red-dark: #8B0000;
-  --g10x-red: #DC143C;
-  --g10x-orange: #FF6B35;
-  --g10x-orange-light: #FF8C42;
-  --g10x-white: #FFFFFF;
-  --g10x-black: #000000;
-  --g10x-gray: #666666;
-  --g10x-gray-light: #F5F5F5;
+  /* Design System Color Palette */
+  --color-background: #F9FAFB;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-divider: #EAECEF;
+  
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-text-disabled: #D1D5DB;
+  
+  --color-accent-primary: #EF4444;
+  --color-accent-hover: #DC2626;
+  --color-accent-soft: #FEF2F2;
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  
+  --color-badge-version: #F3F4F6;
 }
 
 * {
@@ -17,13 +26,11 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--g10x-white);
-  color: var(--g10x-black);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 code {

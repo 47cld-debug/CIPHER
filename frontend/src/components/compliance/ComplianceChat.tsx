@@ -9,14 +9,10 @@ import {
   Avatar,
   Fade,
 } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
-import PersonIcon from '@mui/icons-material/Person';
+import { Send } from 'lucide-react';
+import { Bot, User } from 'lucide-react';
 import { useComplianceDocuments, useComplianceChat } from '../../hooks/useApi';
 import { useUI } from '../../contexts/UIContext';
-
-const CRIMSON = '#DC143C';
-const BORDER = '1px solid rgba(220, 20, 60, 0.2)';
 
 interface Message {
   id: string;
@@ -95,7 +91,7 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
   if (docsLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 280, p: 2 }}>
-        <CircularProgress sx={{ color: CRIMSON }} />
+        <CircularProgress sx={{ color: '#EF4444' }} />
       </Box>
     );
   }
@@ -104,13 +100,14 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
     <Paper
       elevation={0}
       sx={{
-        borderRadius: 3,
-        border: BORDER,
+        borderRadius: '12px',
+        border: '1px solid #E5E7EB',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         minHeight: embedded ? 320 : 480,
         maxHeight: embedded ? 420 : 560,
+        backgroundColor: '#FFFFFF',
       }}
     >
       <Box
@@ -121,7 +118,7 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          bgcolor: 'rgba(0, 0, 0, 0.02)',
+          bgcolor: '#F9FAFB',
         }}
       >
         {messages.length === 0 && (
@@ -145,45 +142,84 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
             }}
           >
             {message.sender === 'ai' && (
-              <Avatar sx={{ bgcolor: CRIMSON, width: 32, height: 32 }}>
-                <SmartToyIcon sx={{ fontSize: 18 }} />
-              </Avatar>
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  backgroundColor: '#F9FAFB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Bot size={18} color="#6B7280" />
+              </Box>
             )}
             <Paper
-              elevation={1}
+              elevation={0}
               sx={{
                 p: 1.5,
                 maxWidth: '85%',
-                bgcolor: message.sender === 'user' ? CRIMSON : 'white',
-                color: message.sender === 'user' ? 'white' : 'text.primary',
-                borderRadius: 2,
-                border: message.sender === 'ai' ? BORDER : 'none',
+                backgroundColor: message.sender === 'user' ? '#EF4444' : '#FFFFFF',
+                borderRadius: '12px',
+                border: message.sender === 'ai' ? '1px solid #E5E7EB' : 'none',
               }}
             >
-              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  whiteSpace: 'pre-wrap',
+                  fontSize: '14px',
+                  color: message.sender === 'user' ? '#FFFFFF' : '#111827',
+                }}
+              >
                 {message.text}
               </Typography>
             </Paper>
             {message.sender === 'user' && (
-              <Avatar sx={{ bgcolor: '#FF6B35', width: 32, height: 32 }}>
-                <PersonIcon sx={{ fontSize: 18 }} />
-              </Avatar>
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  backgroundColor: '#F9FAFB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <User size={18} color="#6B7280" />
+              </Box>
             )}
           </Box>
         ))}
         {chatMutation.isPending && (
           <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-start' }}>
-            <Avatar sx={{ bgcolor: CRIMSON, width: 32, height: 32 }}>
-              <SmartToyIcon sx={{ fontSize: 18 }} />
-            </Avatar>
-            <Paper elevation={1} sx={{ p: 1.5, borderRadius: 2, border: BORDER }}>
-              <CircularProgress size={16} sx={{ color: CRIMSON }} />
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                backgroundColor: '#F9FAFB',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Bot size={18} color="#6B7280" />
+            </Box>
+            <Paper elevation={0} sx={{ p: 1.5, borderRadius: '12px', border: '1px solid #E5E7EB', backgroundColor: '#FFFFFF' }}>
+              <CircularProgress size={16} sx={{ color: '#EF4444' }} />
             </Paper>
           </Box>
         )}
         <div ref={messagesEndRef} />
       </Box>
-      <Box sx={{ p: 2, borderTop: BORDER, display: 'flex', gap: 1 }}>
+      <Box sx={{ p: 2, borderTop: '1px solid #E5E7EB', display: 'flex', gap: 1, backgroundColor: '#FFFFFF' }}>
         <TextField
           fullWidth
           size="small"
@@ -194,9 +230,10 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
           disabled={chatMutation.isPending}
           sx={{
             '& .MuiOutlinedInput-root': {
-              borderRadius: 2,
-              '&:hover fieldset': { borderColor: CRIMSON },
-              '&.Mui-focused fieldset': { borderColor: CRIMSON },
+              borderRadius: '10px',
+              backgroundColor: '#FFFFFF',
+              '&:hover fieldset': { borderColor: '#E5E7EB' },
+              '&.Mui-focused fieldset': { borderColor: '#EF4444' },
             },
           }}
         />
@@ -204,13 +241,14 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
           onClick={() => handleSend()}
           disabled={!input.trim() || chatMutation.isPending}
           sx={{
-            bgcolor: CRIMSON,
-            color: 'white',
-            '&:hover': { bgcolor: '#B0122A' },
-            '&:disabled': { bgcolor: 'rgba(0,0,0,0.12)' },
+            backgroundColor: '#EF4444',
+            color: '#FFFFFF',
+            borderRadius: '10px',
+            '&:hover': { backgroundColor: '#DC2626' },
+            '&:disabled': { backgroundColor: '#D1D5DB', color: '#9CA3AF' },
           }}
         >
-          <SendIcon />
+          <Send size={20} />
         </IconButton>
       </Box>
     </Paper>

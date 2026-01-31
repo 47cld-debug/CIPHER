@@ -1,5 +1,6 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, field_validator, field_serializer
+from typing import List, Optional, Union
+from datetime import datetime
 from models.learning import VerificationStatus, CourseType
 
 
@@ -38,10 +39,17 @@ class CertificateVerificationResponse(BaseModel):
     enrollment_id: int
     file_url: str
     verification_status: VerificationStatus
-    uploaded_at: str
-    verified_at: Optional[str] = None
+    uploaded_at: Union[datetime, str]
+    verified_at: Optional[Union[datetime, str]] = None
     verified_by: Optional[int] = None
     enrollment: Optional[EnrollmentResponse] = None
+
+    @field_validator('uploaded_at', 'verified_at', mode='before')
+    @classmethod
+    def convert_datetime(cls, v):
+        if isinstance(v, datetime):
+            return v.isoformat()
+        return v
 
     class Config:
         from_attributes = True
@@ -79,7 +87,14 @@ class CourseResponse(BaseModel):
     course_type: CourseType
     provider_name: Optional[str] = None
     external_url: Optional[str] = None
-    created_at: str
+    created_at: Union[datetime, str]
+
+    @field_validator('created_at', mode='before')
+    @classmethod
+    def convert_datetime(cls, v):
+        if isinstance(v, datetime):
+            return v.isoformat()
+        return v
 
     class Config:
         from_attributes = True

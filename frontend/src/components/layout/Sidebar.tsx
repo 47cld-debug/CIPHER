@@ -1,11 +1,7 @@
 import React from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import SchoolIcon from '@mui/icons-material/School';
-import WorkIcon from '@mui/icons-material/Work';
-import GavelIcon from '@mui/icons-material/Gavel';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import { LayoutDashboard, GraduationCap, Briefcase, Scale, Heart } from 'lucide-react';
 import { useUI } from '../../contexts/UIContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -18,15 +14,15 @@ const Sidebar: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Learning', icon: <SchoolIcon />, path: '/learning' },
-    { text: 'Career', icon: <WorkIcon />, path: '/career' },
-    { text: 'Compliance', icon: <GavelIcon />, path: '/compliance' },
-    { text: 'Wellness', icon: <FavoriteIcon />, path: '/wellness' },
+    { text: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+    { text: 'Learning', icon: GraduationCap, path: '/learning' },
+    { text: 'Career', icon: Briefcase, path: '/career' },
+    { text: 'Compliance', icon: Scale, path: '/compliance' },
+    { text: 'Wellness', icon: Heart, path: '/wellness' },
   ];
 
   if (user?.role === 'ADMIN') {
-    menuItems.push({ text: 'Admin', icon: <DashboardIcon />, path: '/admin' });
+    menuItems.push({ text: 'Admin', icon: LayoutDashboard, path: '/admin' });
   }
 
   const handleItemClick = (path: string) => {
@@ -42,7 +38,7 @@ const Sidebar: React.FC = () => {
       open={sidebarOpen}
       onClose={() => setSidebarOpen(false)}
       ModalProps={{
-        keepMounted: true, // Better mobile performance
+        keepMounted: true,
       }}
       sx={{
         width: 260,
@@ -51,8 +47,8 @@ const Sidebar: React.FC = () => {
           width: 260,
           boxSizing: 'border-box',
           marginTop: '64px',
-          borderRight: '1px solid rgba(220, 20, 60, 0.1)',
-          background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
+          borderRight: '1px solid #E5E7EB',
+          backgroundColor: '#FFFFFF',
           zIndex: isMobile ? (theme) => theme.zIndex.drawer : (theme) => theme.zIndex.drawer - 1,
           position: 'fixed',
           height: 'calc(100vh - 64px)',
@@ -61,48 +57,50 @@ const Sidebar: React.FC = () => {
     >
       <Box sx={{ overflow: 'auto', mt: 2, px: 1, height: 'calc(100vh - 64px)' }}>
         <List>
-          {menuItems.map((item) => (
-            <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton
-                selected={location.pathname === item.path}
-                onClick={() => handleItemClick(item.path)}
-                sx={{
-                  borderRadius: 2,
-                  mx: 1,
-                  py: 1.5,
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    backgroundColor: 'rgba(220, 20, 60, 0.08)',
-                    transform: 'translateX(4px)',
-                  },
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(220, 20, 60, 0.12)',
-                    borderLeft: '4px solid #DC143C',
-                    '&:hover': {
-                      backgroundColor: 'rgba(220, 20, 60, 0.15)',
-                    },
-                  },
-                }}
-              >
-                <ListItemIcon
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  selected={isActive}
+                  onClick={() => handleItemClick(item.path)}
                   sx={{
-                    color: location.pathname === item.path ? '#DC143C' : 'rgba(0, 0, 0, 0.6)',
-                    minWidth: 40,
+                    height: '44px',
+                    borderRadius: 2,
+                    mx: 1,
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      backgroundColor: isActive ? '#FEF2F2' : '#F9FAFB',
+                    },
+                    '&.Mui-selected': {
+                      backgroundColor: '#FEF2F2',
+                      borderLeft: '3px solid #EF4444',
+                      '&:hover': {
+                        backgroundColor: '#FEF2F2',
+                      },
+                    },
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  primaryTypographyProps={{
-                    fontWeight: location.pathname === item.path ? 600 : 500,
-                    fontSize: '0.95rem',
-                    color: location.pathname === item.path ? '#DC143C' : 'inherit',
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      color: isActive ? '#EF4444' : '#6B7280',
+                      minWidth: 40,
+                    }}
+                  >
+                    {React.createElement(item.icon, { size: 20 })}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{
+                      fontWeight: 400,
+                      fontSize: '14px',
+                      color: isActive ? '#EF4444' : '#111827',
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
       </Box>
     </Drawer>

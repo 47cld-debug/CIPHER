@@ -10,14 +10,15 @@ import WellnessInitiativesWidget from './widgets/WellnessInitiativesWidget';
 import type { UserWidget } from '../../types/dashboard';
 
 const Dashboard: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const hasToken = !!token || (typeof window !== 'undefined' && !!localStorage.getItem('access_token'));
   const { data: dashboard, isLoading, isError, error, refetch } = useDashboardData(hasToken);
+  const userName = user?.full_name || 'there';
 
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px', width: '100%' }}>
-        <CircularProgress sx={{ color: '#DC143C' }} />
+        <CircularProgress sx={{ color: '#EF4444' }} />
       </Box>
     );
   }
@@ -29,19 +30,20 @@ const Dashboard: React.FC = () => {
         <Card
           sx={{
             textAlign: 'center',
-            py: { xs: 4, md: 6 },
-            px: { xs: 2, md: 3 },
-            borderLeft: '4px solid #DC143C',
-            borderRadius: 3,
+            py: 6,
+            px: 4,
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
           }}
         >
-          <Typography variant="h6" sx={{ color: '#DC143C', mb: 2, fontWeight: 600 }}>
+          <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 2 }}>
             Dashboard unavailable
           </Typography>
-          <Typography color="text.secondary" sx={{ mb: 3 }}>
+          <Typography sx={{ fontSize: '14px', color: '#6B7280', mb: 3 }}>
             {message}
           </Typography>
-          <Button variant="contained" onClick={() => refetch()} sx={{ bgcolor: '#DC143C', '&:hover': { bgcolor: '#8B0000' } }}>
+          <Button variant="contained" onClick={() => refetch()} sx={{ backgroundColor: '#EF4444', '&:hover': { backgroundColor: '#DC2626' } }}>
             Retry
           </Button>
         </Card>
@@ -51,27 +53,22 @@ const Dashboard: React.FC = () => {
 
   const renderWidget = (widget: UserWidget) => {
     if (!widget.data) {
-      // Fallback for widgets without data
       return (
         <Card
           sx={{
             height: '100%',
-            borderLeft: '4px solid #DC143C',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-2px)',
-            },
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '24px',
           }}
         >
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, mb: 1 }}>
-              {widget.widget.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {widget.widget.type}
-            </Typography>
-          </Box>
+          <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 500, color: '#111827', mb: 1 }}>
+            {widget.widget.name}
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: '14px', color: '#6B7280' }}>
+            {widget.widget.type}
+          </Typography>
         </Card>
       );
     }
@@ -92,62 +89,147 @@ const Dashboard: React.FC = () => {
           <Card
             sx={{
               height: '100%',
-              borderLeft: '4px solid #DC143C',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              padding: '24px',
             }}
           >
-            <Box sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600 }}>
-                {widget.widget.name}
-              </Typography>
-            </Box>
+            <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 500, color: '#111827' }}>
+              {widget.widget.name}
+            </Typography>
           </Card>
         );
     }
   };
 
+  // Find the "Continue Learning" widget (learning_progress type)
+  const continueLearningWidget = dashboard?.widgets.find(w => w.widget.type === 'learning_progress');
+  const otherWidgets = dashboard?.widgets.filter(w => w.widget.type !== 'learning_progress') || [];
+
   return (
     <Box sx={{ width: '100%', maxWidth: '100%' }}>
+      {/* Page Header - NOT A CARD */}
       <Typography
-        variant="h4"
+        variant="h1"
         component="h1"
-        gutterBottom
         sx={{
-          color: '#DC143C',
-          fontWeight: 700,
-          mb: { xs: 3, md: 4 },
-          letterSpacing: '-0.5px',
+          fontSize: '26px',
+          fontWeight: 600,
+          color: '#111827',
+          mb: 1,
         }}
       >
-        Dashboard
+        Good morning, {userName} 👋
       </Typography>
-      <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
-        {dashboard?.widgets.map((widget) => (
-          <Grid item xs={12} sm={12} md={6} lg={4} key={widget.id}>
-            {renderWidget(widget)}
-          </Grid>
-        ))}
-        {(!dashboard || dashboard.widgets.length === 0) && (
-          <Grid item xs={12}>
-            <Card
-              sx={{
-                textAlign: 'center',
-                py: { xs: 6, md: 8 },
-                px: { xs: 2, md: 4 },
-                background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-                border: '2px dashed rgba(220, 20, 60, 0.3)',
-                borderRadius: 3,
-              }}
-            >
-              <Typography variant="h6" sx={{ color: '#DC143C', mb: 2, fontWeight: 600 }}>
-                Welcome to Your Dashboard
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ maxWidth: '500px', mx: 'auto' }}>
-                No widgets configured yet. Your personalized dashboard widgets will appear here once configured.
-              </Typography>
-            </Card>
-          </Grid>
-        )}
-      </Grid>
+      <Typography
+        variant="body2"
+        sx={{
+          fontSize: '14px',
+          fontWeight: 400,
+          color: '#6B7280',
+          mb: 4,
+        }}
+      >
+        Here's what matters today
+      </Typography>
+
+      {/* Summary Metrics Section - 3 columns */}
+      {dashboard && dashboard.widgets.length > 0 && (
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          {otherWidgets.slice(0, 3).map((widget) => (
+            <Grid item xs={12} sm={4} key={widget.id}>
+              <Card
+                sx={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+                    borderColor: '#FCA5A5',
+                    backgroundColor: '#FEF2F2',
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              >
+                {renderWidget(widget)}
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      {/* Hero Section - Continue Learning - Full Width */}
+      {continueLearningWidget && (
+        <Box
+          sx={{
+            width: '100%',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            padding: '32px',
+            borderRadius: '12px',
+            mb: 3,
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+              borderColor: '#FCA5A5',
+              backgroundColor: '#FEF2F2',
+              transform: 'translateY(-2px)',
+            },
+          }}
+        >
+          {renderWidget(continueLearningWidget)}
+        </Box>
+      )}
+
+      {/* Secondary Widgets - 2 columns */}
+      {otherWidgets.length > 3 && (
+        <Grid container spacing={3}>
+          {otherWidgets.slice(3).map((widget) => (
+            <Grid item xs={12} md={6} key={widget.id}>
+              <Card
+                sx={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.12)',
+                    borderColor: '#FCA5A5',
+                    backgroundColor: '#FEF2F2',
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              >
+                {renderWidget(widget)}
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      {(!dashboard || dashboard.widgets.length === 0) && (
+        <Card
+          sx={{
+            textAlign: 'center',
+            py: 6,
+            px: 4,
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+          }}
+        >
+          <Typography variant="h2" sx={{ fontSize: '18px', fontWeight: 600, color: '#111827', mb: 2 }}>
+            Welcome to Your Dashboard
+          </Typography>
+          <Typography variant="body1" sx={{ fontSize: '14px', color: '#6B7280', maxWidth: '500px', mx: 'auto' }}>
+            No widgets configured yet. Your personalized dashboard widgets will appear here once configured.
+          </Typography>
+        </Card>
+      )}
     </Box>
   );
 };

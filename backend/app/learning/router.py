@@ -48,10 +48,15 @@ def enroll_in_course(
 ):
     """Enroll user in course"""
     service = LearningService(db)
-    enrollment = service.enroll_user(current_user.id, course_id, auto_enrolled=auto_enrolled)
-    if not enrollment:
-        raise HTTPException(status_code=400, detail="Failed to enroll")
-    return enrollment
+    try:
+        enrollment = service.enroll_user(current_user.id, course_id, auto_enrolled=auto_enrolled)
+        if not enrollment:
+            raise HTTPException(status_code=400, detail="Failed to enroll in course")
+        return enrollment
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to enroll: {str(e)}")
 
 
 @router.delete("/enrollments/{enrollment_id}", status_code=status.HTTP_204_NO_CONTENT)

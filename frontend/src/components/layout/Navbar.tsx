@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUI } from '../../contexts/UIContext';
@@ -21,24 +21,24 @@ const Navbar: React.FC = () => {
       elevation={0}
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        background: 'linear-gradient(135deg, #DC143C 0%, #FF6B35 100%)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        background: '#FFFFFF',
+        borderBottom: '1px solid #E5E7EB',
       }}
     >
       <Toolbar sx={{ px: { xs: 2, sm: 3 } }}>
         {user && (
           <IconButton
             edge="start"
-            color="inherit"
             onClick={toggleSidebar}
             sx={{
               mr: 2,
+              color: '#111827',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                backgroundColor: '#F9FAFB',
               },
             }}
           >
-            <MenuIcon />
+            <Menu size={20} />
           </IconButton>
         )}
         <Typography
@@ -46,38 +46,30 @@ const Navbar: React.FC = () => {
           component="div"
           sx={{
             flexGrow: 1,
-            fontWeight: 700,
-            fontSize: '1.25rem',
-            letterSpacing: '-0.3px',
+            fontWeight: 600,
+            fontSize: '18px',
+            color: '#111827',
           }}
         >
-          Employee Portal
+          EmpowerX
         </Typography>
         {user && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              sx={{
-                px: 2,
-                py: 0.5,
-                borderRadius: 2,
-                background: 'rgba(255, 255, 255, 0.15)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <Typography variant="body2" sx={{ fontWeight: 500, color: 'white' }}>
-                {user.full_name}
-              </Typography>
-            </Box>
+            <Typography variant="body2" sx={{ fontWeight: 400, color: '#111827' }}>
+              {user.full_name}
+            </Typography>
             <Button
-              color="inherit"
               onClick={handleLogout}
+              variant="contained"
               sx={{
                 textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: 2,
+                fontWeight: 500,
+                borderRadius: 10,
                 px: 2,
+                height: '36px',
+                backgroundColor: '#EF4444',
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  backgroundColor: '#DC2626',
                 },
               }}
             >
