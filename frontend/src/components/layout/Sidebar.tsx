@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SchoolIcon from '@mui/icons-material/School';
@@ -12,8 +12,10 @@ import { useAuth } from '../../contexts/AuthContext';
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { sidebarOpen } = useUI();
+  const { sidebarOpen, setSidebarOpen } = useUI();
   const { user } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
@@ -27,10 +29,21 @@ const Sidebar: React.FC = () => {
     menuItems.push({ text: 'Admin', icon: <DashboardIcon />, path: '/admin' });
   }
 
+  const handleItemClick = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
     <Drawer
-      variant="persistent"
+      variant={isMobile ? 'temporary' : 'persistent'}
       open={sidebarOpen}
+      onClose={() => setSidebarOpen(false)}
+      ModalProps={{
+        keepMounted: true, // Better mobile performance
+      }}
       sx={{
         width: 260,
         flexShrink: 0,
@@ -40,16 +53,19 @@ const Sidebar: React.FC = () => {
           marginTop: '64px',
           borderRight: '1px solid rgba(220, 20, 60, 0.1)',
           background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
+          zIndex: isMobile ? (theme) => theme.zIndex.drawer : (theme) => theme.zIndex.drawer - 1,
+          position: 'fixed',
+          height: 'calc(100vh - 64px)',
         },
       }}
     >
-      <Box sx={{ overflow: 'auto', mt: 2, px: 1 }}>
+      <Box sx={{ overflow: 'auto', mt: 2, px: 1, height: 'calc(100vh - 64px)' }}>
         <List>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton
                 selected={location.pathname === item.path}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleItemClick(item.path)}
                 sx={{
                   borderRadius: 2,
                   mx: 1,

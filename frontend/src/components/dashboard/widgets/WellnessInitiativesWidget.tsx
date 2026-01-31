@@ -32,10 +32,10 @@ const WellnessInitiativesWidget: React.FC<WellnessInitiativesWidgetProps> = ({ d
         },
       }}
     >
-      <CardContent>
+      <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 }, '&:last-child': { pb: { xs: 2, sm: 2.5, md: 3 } } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <FavoriteIcon sx={{ color: '#FF6B35', fontSize: 28 }} />
-          <Typography variant="h6" sx={{ color: '#FF6B35', fontWeight: 600 }}>
+          <FavoriteIcon sx={{ color: '#FF6B35', fontSize: { xs: 24, md: 28 } }} />
+          <Typography variant="h6" sx={{ color: '#FF6B35', fontWeight: 600, fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Wellness Initiatives
           </Typography>
         </Box>

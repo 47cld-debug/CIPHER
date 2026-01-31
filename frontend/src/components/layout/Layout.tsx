@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useUI } from '../../contexts/UIContext';
@@ -10,23 +10,38 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { sidebarOpen } = useUI();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f5f5f5', width: '100%', overflowX: 'hidden' }}>
       <Navbar />
       <Sidebar />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 2, sm: 3, md: 4 },
-          marginLeft: sidebarOpen ? '260px' : '0',
-          transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          minHeight: 'calc(100vh - 64px)',
+          width: '100%',
+          p: { xs: 2, sm: 2.5, md: 3, lg: 4 },
           marginTop: '64px',
+          minHeight: 'calc(100vh - 64px)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          marginLeft: 0,
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          position: 'relative',
+          overflowX: 'hidden',
         }}
       >
-        {children}
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: { xs: '100%', sm: '100%', md: '1400px', lg: '1600px' },
+            mx: 'auto',
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );
