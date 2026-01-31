@@ -41,7 +41,7 @@ const CourseManagement: React.FC = () => {
     category: '',
     skill_level: '',
     duration: '',
-    course_type: 'INTERNAL' as CourseType,
+    course_type: 'EXTERNAL' as CourseType,
     provider_name: '',
     external_url: '',
   });
@@ -137,7 +137,7 @@ const CourseManagement: React.FC = () => {
         category: '',
         skill_level: '',
         duration: '',
-        course_type: 'INTERNAL',
+        course_type: 'EXTERNAL',
         provider_name: '',
         external_url: '',
       });
@@ -154,7 +154,7 @@ const CourseManagement: React.FC = () => {
       category: '',
       skill_level: '',
       duration: '',
-      course_type: 'INTERNAL',
+      course_type: 'EXTERNAL',
       provider_name: '',
       external_url: '',
     });

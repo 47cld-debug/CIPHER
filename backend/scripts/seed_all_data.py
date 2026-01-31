@@ -69,7 +69,7 @@ def assign_widgets_to_users(widgets):
     db.commit()
 
 def seed_courses():
-    """Seed learning courses"""
+    """Seed learning courses (all EXTERNAL with LinkedIn Learning)"""
     courses_data = [
         {
             "title": "Python for Data Science",
@@ -77,9 +77,9 @@ def seed_courses():
             "category": "Technical",
             "skill_level": "Intermediate",
             "duration": 40.0,
-            "course_type": CourseType.INTERNAL,
-            "provider_name": None,
-            "external_url": None
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/learning-python-25309312/learning-python?u=141392732"
         },
         {
             "title": "React Advanced Patterns",
@@ -87,9 +87,9 @@ def seed_courses():
             "category": "Technical",
             "skill_level": "Advanced",
             "duration": 30.0,
-            "course_type": CourseType.INTERNAL,
-            "provider_name": None,
-            "external_url": None
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/react-advanced-code-challenges/advanced-code-challenges-in-react?u=141392732"
         },
         {
             "title": "Leadership Fundamentals",
@@ -99,7 +99,7 @@ def seed_courses():
             "duration": 20.0,
             "course_type": CourseType.EXTERNAL,
             "provider_name": "LinkedIn Learning",
-            "external_url": "https://www.linkedin.com/learning/leadership-fundamentals"
+            "external_url": "https://www.linkedin.com/learning/leadership-foundations-22307442/welcome-to-leadership-foundations?u=141392732"
         },
         {
             "title": "Effective Communication",
@@ -108,8 +108,8 @@ def seed_courses():
             "skill_level": "Beginner",
             "duration": 15.0,
             "course_type": CourseType.EXTERNAL,
-            "provider_name": "Coursera",
-            "external_url": "https://www.coursera.org/learn/communication"
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/communication-foundations-23064093/communication-for-career-success?u=141392732"
         },
         {
             "title": "Agile Project Management",
@@ -117,9 +117,9 @@ def seed_courses():
             "category": "Technical",
             "skill_level": "Intermediate",
             "duration": 25.0,
-            "course_type": CourseType.INTERNAL,
-            "provider_name": None,
-            "external_url": None
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/agile-foundations/understanding-agile-21059664?u=141392732"
         },
         {
             "title": "Time Management Mastery",
@@ -128,8 +128,8 @@ def seed_courses():
             "skill_level": "Beginner",
             "duration": 10.0,
             "course_type": CourseType.EXTERNAL,
-            "provider_name": "Udemy",
-            "external_url": "https://www.udemy.com/time-management"
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/time-management-fundamentals-14548057/the-power-of-managing-your-time?u=141392732"
         },
         {
             "title": "Cloud Architecture with AWS",
@@ -138,8 +138,8 @@ def seed_courses():
             "skill_level": "Advanced",
             "duration": 50.0,
             "course_type": CourseType.EXTERNAL,
-            "provider_name": "AWS Training",
-            "external_url": "https://aws.amazon.com/training/"
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/building-a-cloud-architecture-diagram/an-in-depth-look-at-cloud-architecture-diagrams?u=141392732"
         },
         {
             "title": "Emotional Intelligence at Work",
@@ -147,9 +147,9 @@ def seed_courses():
             "category": "Soft Skills",
             "skill_level": "Intermediate",
             "duration": 12.0,
-            "course_type": CourseType.INTERNAL,
-            "provider_name": None,
-            "external_url": None
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/developing-your-emotional-intelligence-22196221/developing-your-emotional-intelligence?u=141392732"
         }
     ]
     

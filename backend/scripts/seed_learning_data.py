@@ -39,16 +39,18 @@ def seed_employee_roles():
     db.commit()
 
 def seed_courses():
-    """Seed courses (INTERNAL and EXTERNAL)"""
+    """Seed courses (all EXTERNAL with LinkedIn Learning)"""
     courses_data = [
-        # INTERNAL courses
+        # All courses are now EXTERNAL with LinkedIn Learning
         {
             "title": "Introduction to Python",
             "description": "Learn Python programming fundamentals",
             "category": "Technical",
             "skill_level": "Beginner",
             "duration": 10.0,
-            "course_type": CourseType.INTERNAL,
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/learning-python-25309312/learning-python?u=141392732",
         },
         {
             "title": "Advanced Python Development",
@@ -56,7 +58,9 @@ def seed_courses():
             "category": "Technical",
             "skill_level": "Advanced",
             "duration": 20.0,
-            "course_type": CourseType.INTERNAL,
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/advanced-python-23931756/welcome?u=141392732",
         },
         {
             "title": "JavaScript Fundamentals",
@@ -64,7 +68,9 @@ def seed_courses():
             "category": "Technical",
             "skill_level": "Beginner",
             "duration": 15.0,
-            "course_type": CourseType.INTERNAL,
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/javascript-essential-training/javascript-the-soil-from-which-the-modern-web-grows?u=141392732",
         },
         {
             "title": "React.js Complete Guide",
@@ -72,7 +78,9 @@ def seed_courses():
             "category": "Technical",
             "skill_level": "Intermediate",
             "duration": 25.0,
-            "course_type": CourseType.INTERNAL,
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/react-essential-training/building-modern-user-interfaces-with-react?u=141392732",
         },
         {
             "title": "Leadership Essentials",
@@ -80,7 +88,9 @@ def seed_courses():
             "category": "Leadership",
             "skill_level": "Intermediate",
             "duration": 12.0,
-            "course_type": CourseType.INTERNAL,
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/search?keywords=leadership%20essentials&u=141392732",
         },
         {
             "title": "Communication Skills",
@@ -88,7 +98,9 @@ def seed_courses():
             "category": "Soft Skills",
             "skill_level": "Beginner",
             "duration": 8.0,
-            "course_type": CourseType.INTERNAL,
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/communicating-with-confidence-23450131/prepare-to-become-a-more-confident-communicator?u=141392732",
         },
         {
             "title": "Testing Fundamentals",
@@ -96,9 +108,10 @@ def seed_courses():
             "category": "Technical",
             "skill_level": "Beginner",
             "duration": 12.0,
-            "course_type": CourseType.INTERNAL,
+            "course_type": CourseType.EXTERNAL,
+            "provider_name": "LinkedIn Learning",
+            "external_url": "https://www.linkedin.com/learning/netops-devops-for-network-engineers-automating-networks/devops-for-network-engineers?u=141392732",
         },
-        # EXTERNAL courses
         {
             "title": "Python for Data Science",
             "description": "Comprehensive Python data science course",
@@ -107,7 +120,7 @@ def seed_courses():
             "duration": 15.0,
             "course_type": CourseType.EXTERNAL,
             "provider_name": "LinkedIn Learning",
-            "external_url": "https://www.linkedin.com/learning/python-for-data-science",
+            "external_url": "https://www.linkedin.com/learning/learning-python-25309312/learning-python?u=141392732",
         },
         {
             "title": "Salesforce Administration",
@@ -117,7 +130,7 @@ def seed_courses():
             "duration": 20.0,
             "course_type": CourseType.EXTERNAL,
             "provider_name": "LinkedIn Learning",
-            "external_url": "https://www.linkedin.com/learning/salesforce-administration",
+            "external_url": "https://www.linkedin.com/learning/salesforce-administrator-cert-prep-the-basics/introduction-and-exam-overview?u=141392732",
         },
         {
             "title": "Advanced Testing Strategies",
@@ -127,7 +140,7 @@ def seed_courses():
             "duration": 15.0,
             "course_type": CourseType.EXTERNAL,
             "provider_name": "LinkedIn Learning",
-            "external_url": "https://www.linkedin.com/learning/advanced-testing-strategies",
+            "external_url": "https://www.linkedin.com/learning/strategic-business-analysis-essentials/your-role-in-shaping-business-strategy?u=141392732",
         },
         {
             "title": "Salesforce Development",
@@ -137,7 +150,7 @@ def seed_courses():
             "duration": 25.0,
             "course_type": CourseType.EXTERNAL,
             "provider_name": "LinkedIn Learning",
-            "external_url": "https://www.linkedin.com/learning/salesforce-development",
+            "external_url": "https://www.linkedin.com/learning/salesforce-essential-training-24934421/learning-the-essentials-of-salesforce?u=141392732",
         },
     ]
     
@@ -150,7 +163,11 @@ def seed_courses():
             created_courses.append(course)
             print(f"✓ Created course: {course_data['title']}")
         else:
+            # Update existing course with new data
+            for key, value in course_data.items():
+                setattr(existing, key, value)
             created_courses.append(existing)
+            print(f"✓ Updated course: {course_data['title']}")
     
     db.commit()
     return created_courses
