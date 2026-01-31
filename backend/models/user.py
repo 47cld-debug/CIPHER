@@ -19,6 +19,7 @@ class User(Base):
     email = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     role = Column(Enum(UserRole), default=UserRole.EMPLOYEE, nullable=False)
+    job_title = Column(String, nullable=True)  # Current job role for career mentor
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     last_login = Column(DateTime(timezone=True), nullable=True)
 
@@ -31,3 +32,4 @@ class User(Base):
     sessions = relationship("Session", back_populates="user")
     user_widgets = relationship("UserWidget", back_populates="user")
     career_profile = relationship("CareerProfile", back_populates="user", uselist=False)
+    user_skills = relationship("UserSkill", back_populates="user")

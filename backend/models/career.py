@@ -58,6 +58,7 @@ class Appraisal(Base):
     period = Column(String, nullable=False)
     self_review = Column(Text, nullable=True)
     manager_feedback = Column(Text, nullable=True)
+    performance_rating = Column(String, nullable=True)  # e.g. "Exceeds", "Meets", or 1-5
     status = Column(Enum(AppraisalStatus), default=AppraisalStatus.DRAFT, nullable=False)
 
     # Relationships

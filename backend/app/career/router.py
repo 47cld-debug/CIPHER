@@ -10,6 +10,8 @@ from app.career.schemas import (
     CareerSummaryResponse,
     SkillResponse,
     AchievementItem,
+    CareerGrowthSummaryResponse,
+    MentorSuggestionsResponse,
 )
 from app.career.service import CareerService
 
@@ -64,3 +66,23 @@ def get_career_achievements(
     """Get achievements (completed goals + completed courses)"""
     service = CareerService(db)
     return service.get_user_achievements(current_user.id)
+
+
+@router.get("/growth", response_model=CareerGrowthSummaryResponse)
+def get_career_growth(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get career growth summary: goals tab (in-progress courses), skills tab, achievements tab, progress %"""
+    service = CareerService(db)
+    return service.get_growth_summary(current_user.id)
+
+
+@router.get("/mentor-suggestions", response_model=MentorSuggestionsResponse)
+async def get_mentor_suggestions(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get AI career mentor suggestions and skill gaps"""
+    service = CareerService(db)
+    return await service.get_mentor_suggestions(current_user.id, current_user)

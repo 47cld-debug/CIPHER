@@ -95,6 +95,20 @@ class Skill(Base):
 
     # Relationships
     course_skills = relationship("CourseSkill", back_populates="skill")
+    user_skills = relationship("UserSkill", back_populates="skill")
+
+
+class UserSkill(Base):
+    """Skills the user already has (distinct from skills gained via courses/certs)."""
+    __tablename__ = "user_skills"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    skill_id = Column(Integer, ForeignKey("skills.id"), nullable=False)
+
+    # Relationships
+    user = relationship("User", back_populates="user_skills")
+    skill = relationship("Skill", back_populates="user_skills")
 
 
 class CourseSkill(Base):

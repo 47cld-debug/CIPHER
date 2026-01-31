@@ -129,6 +129,26 @@ export const useCareerAchievements = () => {
   });
 };
 
+export const useCareerGrowthSummary = () => {
+  return useQuery({
+    queryKey: ['career', 'growth'],
+    queryFn: () => careerApi.getCareerGrowthSummary(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
+};
+
+export const useCareerMentorSuggestions = () => {
+  return useQuery({
+    queryKey: ['career', 'mentor-suggestions'],
+    queryFn: () => careerApi.getCareerMentorSuggestions(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 60000, // 1 min for AI response
+  });
+};
+
 // Compliance hooks
 export const usePolicies = (search?: string) => {
   return useQuery({
