@@ -47,10 +47,10 @@ const UpcomingCoursesWidget: React.FC<UpcomingCoursesWidgetProps> = ({ data }) =
         },
       }}
     >
-      <CardContent>
+      <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 }, '&:last-child': { pb: { xs: 2, sm: 2.5, md: 3 } } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <BookIcon sx={{ color: '#FF6B35', fontSize: 28 }} />
-          <Typography variant="h6" sx={{ color: '#FF6B35', fontWeight: 600 }}>
+          <BookIcon sx={{ color: '#FF6B35', fontSize: { xs: 24, md: 28 } }} />
+          <Typography variant="h6" sx={{ color: '#FF6B35', fontWeight: 600, fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Upcoming Courses
           </Typography>
         </Box>
@@ -70,12 +70,12 @@ const UpcomingCoursesWidget: React.FC<UpcomingCoursesWidgetProps> = ({ data }) =
             </Button>
           </Box>
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, md: 2 } }}>
             {data.courses.map((course) => (
               <Box
                 key={course.id}
                 sx={{
-                  p: 2,
+                  p: { xs: 1.5, md: 2 },
                   borderRadius: 2,
                   border: '1px solid rgba(255, 107, 53, 0.2)',
                   backgroundColor: 'rgba(255, 107, 53, 0.05)',

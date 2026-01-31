@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Container,
   Paper,
   Grid,
   Card,
@@ -18,7 +17,7 @@ const WellnessPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '100%' }}>
       <Paper
         elevation={0}
         sx={{
@@ -29,7 +28,7 @@ const WellnessPage: React.FC = () => {
           border: '1px solid rgba(220, 20, 60, 0.1)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
           <Box
             sx={{
               p: 2,
@@ -38,11 +37,12 @@ const WellnessPage: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
             }}
           >
-            <FavoriteIcon sx={{ color: 'white', fontSize: 32 }} />
+            <FavoriteIcon sx={{ color: 'white', fontSize: { xs: 28, md: 32 } }} />
           </Box>
-          <Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
               variant="h4"
               component="h1"
@@ -51,6 +51,7 @@ const WellnessPage: React.FC = () => {
                 fontWeight: 700,
                 mb: 0.5,
                 letterSpacing: '-0.5px',
+                fontSize: { xs: '1.75rem', md: '2.125rem' },
               }}
             >
               Wellness & Health
@@ -141,7 +142,7 @@ const WellnessPage: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
-    </Container>
+    </Box>
   );
 };
 

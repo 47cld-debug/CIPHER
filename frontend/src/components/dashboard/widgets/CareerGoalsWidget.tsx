@@ -37,10 +37,10 @@ const CareerGoalsWidget: React.FC<CareerGoalsWidgetProps> = ({ data }) => {
       }}
       onClick={() => navigate('/career')}
     >
-      <CardContent>
+      <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 }, '&:last-child': { pb: { xs: 2, sm: 2.5, md: 3 } } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <WorkIcon sx={{ color: '#DC143C', fontSize: 28 }} />
-          <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600 }}>
+          <WorkIcon sx={{ color: '#DC143C', fontSize: { xs: 24, md: 28 } }} />
+          <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Career Goals
           </Typography>
         </Box>
@@ -69,20 +69,20 @@ const CareerGoalsWidget: React.FC<CareerGoalsWidgetProps> = ({ data }) => {
           />
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: { xs: 1.5, md: 2 }, mb: 3 }}>
           <Box
             sx={{
               flex: 1,
               textAlign: 'center',
-              p: 1.5,
+              p: { xs: 1.25, md: 1.5 },
               borderRadius: 2,
               backgroundColor: 'rgba(33, 150, 243, 0.1)',
             }}
           >
-            <Typography variant="h6" sx={{ color: '#2196f3', fontWeight: 700 }}>
+            <Typography variant="h6" sx={{ color: '#2196f3', fontWeight: 700, fontSize: { xs: '1rem', md: '1.25rem' } }}>
               {data.active_goals}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}>
               Active
             </Typography>
           </Box>
@@ -90,15 +90,15 @@ const CareerGoalsWidget: React.FC<CareerGoalsWidgetProps> = ({ data }) => {
             sx={{
               flex: 1,
               textAlign: 'center',
-              p: 1.5,
+              p: { xs: 1.25, md: 1.5 },
               borderRadius: 2,
               backgroundColor: 'rgba(76, 175, 80, 0.1)',
             }}
           >
-            <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 700 }}>
+            <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 700, fontSize: { xs: '1rem', md: '1.25rem' } }}>
               {data.completed_goals}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}>
               Completed
             </Typography>
           </Box>

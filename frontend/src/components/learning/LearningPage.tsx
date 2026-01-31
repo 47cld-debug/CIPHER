@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Container, Paper, TextField, InputAdornment } from '@mui/material';
+import { Box, Typography, Paper, TextField, InputAdornment } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import SearchIcon from '@mui/icons-material/Search';
 import CourseList from './CourseList';
@@ -12,18 +12,18 @@ const LearningPage: React.FC = () => {
   const { data: enrollments = [] } = useEnrollments();
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '100%' }}>
       <Paper
         elevation={0}
         sx={{
           background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-          p: 4,
-          mb: 4,
+          p: { xs: 2.5, sm: 3, md: 4 },
+          mb: { xs: 3, md: 4 },
           borderRadius: 3,
           border: '1px solid rgba(220, 20, 60, 0.1)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
           <Box
             sx={{
               p: 2,
@@ -32,11 +32,12 @@ const LearningPage: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
             }}
           >
-            <SchoolIcon sx={{ color: 'white', fontSize: 32 }} />
+            <SchoolIcon sx={{ color: 'white', fontSize: { xs: 28, md: 32 } }} />
           </Box>
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
               variant="h4"
               component="h1"
@@ -45,6 +46,7 @@ const LearningPage: React.FC = () => {
                 fontWeight: 700,
                 mb: 0.5,
                 letterSpacing: '-0.5px',
+                fontSize: { xs: '1.75rem', md: '2.125rem' },
               }}
             >
               Learning & Development
@@ -86,7 +88,7 @@ const LearningPage: React.FC = () => {
       <CourseList searchQuery={searchQuery || undefined} />
       <CompletedCoursesSection enrollments={enrollments} />
       <AILearningChatbot />
-    </Container>
+    </Box>
   );
 };
 

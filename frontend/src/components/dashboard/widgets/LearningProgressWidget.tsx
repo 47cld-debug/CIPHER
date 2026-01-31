@@ -41,10 +41,10 @@ const LearningProgressWidget: React.FC<LearningProgressWidgetProps> = ({ data })
       }}
       onClick={() => navigate('/learning')}
     >
-      <CardContent>
+      <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 }, '&:last-child': { pb: { xs: 2, sm: 2.5, md: 3 } } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <SchoolIcon sx={{ color: '#DC143C', fontSize: 28 }} />
-          <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600 }}>
+          <SchoolIcon sx={{ color: '#DC143C', fontSize: { xs: 24, md: 28 } }} />
+          <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Learning Progress
           </Typography>
         </Box>
@@ -73,58 +73,58 @@ const LearningProgressWidget: React.FC<LearningProgressWidgetProps> = ({ data })
           />
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: { xs: 1.5, md: 2 }, mb: 3, flexWrap: 'wrap' }}>
           <Box
             sx={{
-              flex: 1,
-              minWidth: '80px',
+              flex: { xs: '1 1 calc(33.333% - 10px)', sm: 1 },
+              minWidth: { xs: '80px', sm: '100px' },
               textAlign: 'center',
-              p: 1.5,
+              p: { xs: 1.25, md: 1.5 },
               borderRadius: 2,
               backgroundColor: 'rgba(76, 175, 80, 0.1)',
             }}
           >
-            <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 24, mb: 0.5 }} />
-            <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 700 }}>
+            <CheckCircleIcon sx={{ color: '#4caf50', fontSize: { xs: 20, md: 24 }, mb: 0.5 }} />
+            <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 700, fontSize: { xs: '1rem', md: '1.25rem' } }}>
               {data.completed}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}>
               Completed
             </Typography>
           </Box>
           <Box
             sx={{
-              flex: 1,
-              minWidth: '80px',
+              flex: { xs: '1 1 calc(33.333% - 10px)', sm: 1 },
+              minWidth: { xs: '80px', sm: '100px' },
               textAlign: 'center',
-              p: 1.5,
+              p: { xs: 1.25, md: 1.5 },
               borderRadius: 2,
               backgroundColor: 'rgba(33, 150, 243, 0.1)',
             }}
           >
-            <PlayCircleIcon sx={{ color: '#2196f3', fontSize: 24, mb: 0.5 }} />
-            <Typography variant="h6" sx={{ color: '#2196f3', fontWeight: 700 }}>
+            <PlayCircleIcon sx={{ color: '#2196f3', fontSize: { xs: 20, md: 24 }, mb: 0.5 }} />
+            <Typography variant="h6" sx={{ color: '#2196f3', fontWeight: 700, fontSize: { xs: '1rem', md: '1.25rem' } }}>
               {data.in_progress}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}>
               In Progress
             </Typography>
           </Box>
           <Box
             sx={{
-              flex: 1,
-              minWidth: '80px',
+              flex: { xs: '1 1 calc(33.333% - 10px)', sm: 1 },
+              minWidth: { xs: '80px', sm: '100px' },
               textAlign: 'center',
-              p: 1.5,
+              p: { xs: 1.25, md: 1.5 },
               borderRadius: 2,
               backgroundColor: 'rgba(158, 158, 158, 0.1)',
             }}
           >
-            <SchoolIcon sx={{ color: '#9e9e9e', fontSize: 24, mb: 0.5 }} />
-            <Typography variant="h6" sx={{ color: '#9e9e9e', fontWeight: 700 }}>
+            <SchoolIcon sx={{ color: '#9e9e9e', fontSize: { xs: 20, md: 24 }, mb: 0.5 }} />
+            <Typography variant="h6" sx={{ color: '#9e9e9e', fontWeight: 700, fontSize: { xs: '1rem', md: '1.25rem' } }}>
               {data.not_started}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}>
               Not Started
             </Typography>
           </Box>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Container,
   Paper,
   Grid,
   Card,
@@ -40,17 +39,17 @@ const CompliancePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ width: '100%', maxWidth: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
           <CircularProgress sx={{ color: '#DC143C' }} />
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (hasError) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ width: '100%', maxWidth: '100%' }}>
         <Paper
           elevation={0}
           sx={{
@@ -70,23 +69,23 @@ const CompliancePage: React.FC = () => {
               : 'Failed to load compliance information. Please try again.'}
           </Typography>
         </Paper>
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '100%' }}>
       <Paper
         elevation={0}
         sx={{
           background: 'linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%)',
-          p: 4,
-          mb: 4,
+          p: { xs: 2.5, sm: 3, md: 4 },
+          mb: { xs: 3, md: 4 },
           borderRadius: 3,
           border: '1px solid rgba(220, 20, 60, 0.1)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
           <Box
             sx={{
               p: 2,
@@ -95,11 +94,12 @@ const CompliancePage: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
             }}
           >
-            <GavelIcon sx={{ color: 'white', fontSize: 32 }} />
+            <GavelIcon sx={{ color: 'white', fontSize: { xs: 28, md: 32 } }} />
           </Box>
-          <Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
               variant="h4"
               component="h1"
@@ -108,6 +108,7 @@ const CompliancePage: React.FC = () => {
                 fontWeight: 700,
                 mb: 0.5,
                 letterSpacing: '-0.5px',
+                fontSize: { xs: '1.75rem', md: '2.125rem' },
               }}
             >
               Compliance & Policies
@@ -372,7 +373,7 @@ const CompliancePage: React.FC = () => {
           )}
         </Box>
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Container,
   Paper,
   Grid,
   Card,
@@ -58,17 +57,17 @@ const CareerPage: React.FC = () => {
 
   if (isLoading && !summary) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ width: '100%', maxWidth: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
           <CircularProgress sx={{ color: CRIMSON }} />
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (hasError) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ width: '100%', maxWidth: '100%' }}>
         <Paper
           elevation={0}
           sx={{
@@ -88,7 +87,7 @@ const CareerPage: React.FC = () => {
               : 'Failed to load career information. Please try again.'}
           </Typography>
         </Paper>
-      </Container>
+      </Box>
     );
   }
 
@@ -97,9 +96,9 @@ const CareerPage: React.FC = () => {
   const achievementsCount = achievements?.length ?? 0;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '100%' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: { xs: 2.5, md: 3 }, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
         <Box
           sx={{
             p: 2,
@@ -108,12 +107,13 @@ const CareerPage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
-          <WorkIcon sx={{ color: 'white', fontSize: 32 }} />
+          <WorkIcon sx={{ color: 'white', fontSize: { xs: 28, md: 32 } }} />
         </Box>
-        <Box>
-          <Typography variant="h4" component="h1" sx={{ color: CRIMSON, fontWeight: 700, mb: 0.5, letterSpacing: '-0.5px' }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="h4" component="h1" sx={{ color: CRIMSON, fontWeight: 700, mb: 0.5, letterSpacing: '-0.5px', fontSize: { xs: '1.75rem', md: '2.125rem' } }}>
             Career Growth
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -412,7 +412,7 @@ const CareerPage: React.FC = () => {
           )}
         </Box>
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

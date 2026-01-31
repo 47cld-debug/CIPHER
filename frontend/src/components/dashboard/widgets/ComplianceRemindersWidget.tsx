@@ -43,10 +43,10 @@ const ComplianceRemindersWidget: React.FC<ComplianceRemindersWidgetProps> = ({ d
       }}
       onClick={() => navigate('/compliance')}
     >
-      <CardContent>
+      <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 }, '&:last-child': { pb: { xs: 2, sm: 2.5, md: 3 } } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <GavelIcon sx={{ color: '#DC143C', fontSize: 28 }} />
-          <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600 }}>
+          <GavelIcon sx={{ color: '#DC143C', fontSize: { xs: 24, md: 28 } }} />
+          <Typography variant="h6" sx={{ color: '#DC143C', fontWeight: 600, fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Compliance Reminders
           </Typography>
         </Box>
