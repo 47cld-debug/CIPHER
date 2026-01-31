@@ -44,19 +44,25 @@ class HRAgentService:
             except Exception as e:
                 logger.warning(f"ChromaDB search failed for HR: {e}")
         
-        # Build context from retrieved chunks
-        if relevant_chunks:
-            context_parts = []
-            for chunk in relevant_chunks:
-                doc_text = chunk.get('document', '')
-                metadata = chunk.get('metadata', {})
-                filename = metadata.get('filename', 'Document')
-                context_parts.append(f"[From: {filename}]\n{doc_text}")
-            
-            policy_context = "\n\n---\n\n".join(context_parts)
-        else:
-            policy_context = "No specific HR policies found. General HR guidance may be provided."
+        # If no relevant chunks found, return early with "no documents" message
+        if not relevant_chunks:
             logger.warning("No HR chunks retrieved from ChromaDB")
+            return {
+                "response": "No relevant documents found in the database for this query. Please contact an administrator to upload relevant policy documents.",
+                "agent": "hr",
+                "compliant": None,
+                "policy_references": []
+            }
+        
+        # Build context from retrieved chunks
+        context_parts = []
+        for chunk in relevant_chunks:
+            doc_text = chunk.get('document', '')
+            metadata = chunk.get('metadata', {})
+            filename = metadata.get('filename', 'Document')
+            context_parts.append(f"[From: {filename}]\n{doc_text}")
+        
+        policy_context = "\n\n---\n\n".join(context_parts)
         
         # Generate response using OpenAI
         try:

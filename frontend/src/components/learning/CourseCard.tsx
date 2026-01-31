@@ -37,7 +37,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
     if (enrollment) {
       setProgressModalOpen(true);
     } else {
-      // Auto-enroll and show progress modal
+      // Auto-enroll silently without showing progress modal
       try {
         const newEnrollment = await learningApi.enrollInCourse(course.id, false);
         addNotification({
@@ -46,10 +46,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, enrollment, onEnroll, o
           type: 'success',
         });
         queryClient.invalidateQueries({ queryKey: ['enrollments'] });
-        // Show progress modal after enrollment
-        setTimeout(() => {
-          setProgressModalOpen(true);
-        }, 100);
       } catch (error: any) {
         addNotification({
           id: Date.now().toString(),

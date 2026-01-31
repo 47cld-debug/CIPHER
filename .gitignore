@@ -14,6 +14,9 @@ ENV/
 *.db
 *.sqlite
 
+# ChromaDB
+backend/chroma_db/
+
 # Environment
 .env
 .env.local
