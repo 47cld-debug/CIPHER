@@ -30,6 +30,7 @@ This is a condensed version of the setup process. For detailed instructions, see
    DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/employee_portal
    JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
    EMAIL_MOCK_MODE=true
+   OPENAI_API_KEY=sk-your-openai-key   # Required for Compliance RAG Chatbot (upload docs + chat)
    ```
 
 5. **Create database:**
@@ -41,6 +42,7 @@ This is a condensed version of the setup process. For detailed instructions, see
    ```bash
    alembic upgrade head
    ```
+   If you see "Multiple head revisions", the repo includes a merge migration (`c3d4e5f6a7b8`); ensure you have the latest code and run the command again.
 
 7. **Seed employees:**
    ```bash

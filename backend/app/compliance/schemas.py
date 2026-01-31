@@ -34,3 +34,22 @@ class ReminderResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# RAG Compliance Chatbot
+class DocumentInfo(BaseModel):
+    filename: str
+    chunks: int
+
+
+class UploadResponse(BaseModel):
+    uploaded: List[str]
+    chunks_added: int
+
+
+class ComplianceChatRequest(BaseModel):
+    message: str
+
+
+class ComplianceChatResponse(BaseModel):
+    response: str

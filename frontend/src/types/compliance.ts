@@ -21,3 +21,18 @@ export interface Reminder {
   due_date?: string;
   completed: boolean;
 }
+
+// RAG Compliance Chatbot
+export interface DocumentInfo {
+  filename: string;
+  chunks: number;
+}
+
+export interface UploadResponse {
+  uploaded: string[];
+  chunks_added: number;
+}
+
+export interface ComplianceChatResponse {
+  response: string;
+}

@@ -161,6 +161,43 @@ export const useReminders = () => {
   });
 };
 
+// RAG Compliance Chatbot
+export const useComplianceDocuments = () => {
+  return useQuery({
+    queryKey: ['compliance', 'documents'],
+    queryFn: () => complianceApi.getDocuments(),
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 10000,
+  });
+};
+
+export const useUploadComplianceDocuments = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (files: File[]) => complianceApi.uploadDocuments(files),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['compliance', 'documents'] });
+    },
+  });
+};
+
+export const useClearComplianceDocuments = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => complianceApi.clearDocuments(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['compliance', 'documents'] });
+    },
+  });
+};
+
+export const useComplianceChat = () => {
+  return useMutation({
+    mutationFn: (message: string) => complianceApi.complianceChat(message),
+  });
+};
+
 // Wellness hooks
 export const useInitiatives = () => {
   return useQuery({

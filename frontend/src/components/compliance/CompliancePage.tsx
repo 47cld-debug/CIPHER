@@ -13,15 +13,20 @@ import {
   AccordionSummary,
   AccordionDetails,
   Chip,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { usePolicies, useFAQs, useReminders } from '../../hooks/useApi';
-import AIChatAssistant from './AIChatAssistant';
+import ComplianceUploadPanel from './ComplianceUploadPanel';
+import ComplianceChat from './ComplianceChat';
 
 const CompliancePage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [faqCategory, setFaqCategory] = useState<string>('');
+  const [tab, setTab] = useState(0);
 
   const { data: policies = [], isLoading: policiesLoading, isError: policiesError, error: policiesErrorData } = usePolicies(search || undefined);
   const { data: faqs = [], isLoading: faqsLoading, isError: faqsError, error: faqsErrorData } = useFAQs(faqCategory || undefined);
@@ -111,8 +116,42 @@ const CompliancePage: React.FC = () => {
         </Box>
       </Paper>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid rgba(220, 20, 60, 0.1)',
+          overflow: 'hidden',
+        }}
+      >
+        <Tabs
+          value={tab}
+          onChange={(_, v) => setTab(v)}
+          sx={{
+            borderBottom: '1px solid rgba(220, 20, 60, 0.1)',
+            '& .MuiTab-root': { fontWeight: 600 },
+            '& .Mui-selected': { color: '#DC143C' },
+            '& .MuiTabs-indicator': { backgroundColor: '#DC143C' },
+          }}
+        >
+          <Tab icon={<SmartToyIcon />} iconPosition="start" label="AI Assistant" />
+          <Tab label="Policies & FAQs" />
+        </Tabs>
+        <Box sx={{ p: 3 }}>
+          {tab === 0 && (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={4}>
+                <ComplianceUploadPanel />
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <ComplianceChat embedded />
+              </Grid>
+            </Grid>
+          )}
+          {tab === 1 && (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
           <Paper
             elevation={0}
             sx={{
@@ -322,8 +361,10 @@ const CompliancePage: React.FC = () => {
             )}
           </Paper>
         </Grid>
-      </Grid>
-      <AIChatAssistant />
+            </Grid>
+          )}
+        </Box>
+      </Paper>
     </Container>
   );
 };

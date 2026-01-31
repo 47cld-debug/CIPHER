@@ -169,6 +169,9 @@ def seed_courses():
 
 def seed_enrollments(courses, users):
     """Seed course enrollments"""
+    if len(users) < 3 or len(courses) < 8:
+        print("⚠ Skipping enrollments: need at least 3 users and 8 courses (run seed_employees.py and ensure seed_courses created 8).")
+        return
     enrollments_data = [
         # User 1 enrollments
         {"user": users[0], "course": courses[0], "progress": ProgressState.MEDIUM, "status": EnrollmentStatus.ENROLLED},
@@ -202,6 +205,9 @@ def seed_enrollments(courses, users):
 
 def seed_goals(users):
     """Seed career goals"""
+    if len(users) < 3:
+        print("⚠ Skipping career goals: need at least 3 users.")
+        return
     goals_data = [
         {
             "user": users[0],
@@ -267,6 +273,9 @@ def seed_goals(users):
 
 def seed_appraisals(users):
     """Seed performance appraisals"""
+    if len(users) < 3:
+        print("⚠ Skipping appraisals: need at least 3 users.")
+        return
     appraisals_data = [
         {
             "user": users[0],
@@ -398,6 +407,9 @@ def seed_faqs(policies):
 
 def seed_reminders(users):
     """Seed compliance reminders"""
+    if len(users) < 3:
+        print("⚠ Skipping compliance reminders: need at least 3 users.")
+        return
     reminders_data = [
         {
             "user": users[0],
@@ -497,6 +509,9 @@ def seed_initiatives():
 
 def seed_sessions(initiatives, users):
     """Seed wellness sessions"""
+    if len(users) < 3 or len(initiatives) < 4:
+        print("⚠ Skipping wellness sessions: need at least 3 users and 4 initiatives.")
+        return
     sessions_data = [
         {
             "user": users[0],

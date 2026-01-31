@@ -90,6 +90,39 @@ class OpenAIService:
             logger.error(f"OpenAI API error: {e}")
             return "I'm having trouble processing your question. Please try again later."
 
+    async def answer_compliance_rag(self, question: str, context_text: str) -> str:
+        """Answer ONLY from provided document context. No external knowledge. Strict RAG."""
+        if not self.client:
+            return "I'm currently in demo mode. Please upload documents and ensure OpenAI is configured for the Compliance Assistant."
+
+        system = (
+            "You are a compliance assistant. Answer ONLY using the following document context. "
+            "Do not use external knowledge. If the context does not contain the answer, say so clearly. "
+            "Domains: HR Policy, IT Policy, Leave & Attendance, Compliance & Company SOPs. "
+            "Keep answers concise and reference the documents implicitly."
+        )
+        try:
+            prompt = f"Document context:\n\n{context_text}\n\nQuestion: {question}"
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.2,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            err_name = type(e).__name__
+            if err_name == "RateLimitError" or (getattr(e, "status_code", None) == 429):
+                logger.warning("OpenAI quota exceeded: %s", e)
+                return "OpenAI quota exceeded. Please check your plan and billing at https://platform.openai.com, or try again later."
+            if err_name == "AuthenticationError" or (getattr(e, "status_code", None) == 401):
+                logger.warning("OpenAI invalid API key: %s", e)
+                return "Invalid OpenAI API key. Please check OPENAI_API_KEY in backend/.env and restart the server."
+            logger.error(f"OpenAI API error: {e}")
+            return "I'm having trouble processing your question. Please try again later."
+
     async def get_rag_learning_recommendations(
         self,
         user_query: str,
