@@ -1,7 +1,7 @@
 from models.user import User
 from models.employee import Employee
 from models.dashboard import Widget, UserWidget
-from models.learning import Course, Enrollment, Certificate, Skill, CourseSkill
+from models.learning import Course, Enrollment, Certificate, Skill, CourseSkill, UserSkill
 from models.career import Goal, Appraisal, Feedback, CareerProfile
 from models.compliance import Policy, FAQ, Reminder
 from models.wellness import Initiative, Session
@@ -16,6 +16,7 @@ __all__ = [
     "Certificate",
     "Skill",
     "CourseSkill",
+    "UserSkill",
     "Goal",
     "Appraisal",
     "Feedback",

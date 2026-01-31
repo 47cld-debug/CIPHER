@@ -1,8 +1,9 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
-from models.learning import Course, Enrollment, Certificate, Skill, CourseSkill
-from models.learning import CourseType, ProgressState
+from sqlalchemy import and_, distinct
+from sqlalchemy.orm import joinedload
+from models.learning import Course, Enrollment, Certificate, Skill, CourseSkill, UserSkill
+from models.learning import CourseType, ProgressState, EnrollmentStatus
 from repositories.base import BaseRepository
 
 
@@ -76,3 +77,60 @@ class SkillRepository(BaseRepository[Skill]):
 
     def get_by_name(self, name: str) -> Optional[Skill]:
         return self.db.query(Skill).filter(Skill.name == name).first()
+
+    def get_skills_for_user_from_completed_courses(self, user_id: int) -> List[Skill]:
+        """Distinct skills from courses where user has completed enrollment (status COMPLETED)."""
+        return (
+            self.db.query(Skill)
+            .join(CourseSkill, CourseSkill.skill_id == Skill.id)
+            .join(Course, Course.id == CourseSkill.course_id)
+            .join(Enrollment, Enrollment.course_id == Course.id)
+            .filter(
+                Enrollment.user_id == user_id,
+                Enrollment.status == EnrollmentStatus.COMPLETED,
+            )
+            .distinct()
+            .all()
+        )
+
+    def get_skills_for_user_from_certifications(self, user_id: int) -> List[Skill]:
+        """Distinct skills from courses where user has an enrollment with a certificate."""
+        return (
+            self.db.query(Skill)
+            .join(CourseSkill, CourseSkill.skill_id == Skill.id)
+            .join(Course, Course.id == CourseSkill.course_id)
+            .join(Enrollment, Enrollment.course_id == Course.id)
+            .join(Certificate, Certificate.enrollment_id == Enrollment.id)
+            .filter(Enrollment.user_id == user_id)
+            .distinct()
+            .all()
+        )
+
+
+class UserSkillRepository(BaseRepository[UserSkill]):
+    def __init__(self, db: Session):
+        super().__init__(UserSkill, db)
+
+    def get_by_user(self, user_id: int) -> List[UserSkill]:
+        return (
+            self.db.query(UserSkill)
+            .options(joinedload(UserSkill.skill))
+            .filter(UserSkill.user_id == user_id)
+            .all()
+        )
+
+    def get_skills_for_user(self, user_id: int) -> List[Skill]:
+        """Return Skill objects for skills the user already has (UserSkill)."""
+        rows = self.get_by_user(user_id)
+        return [r.skill for r in rows if r.skill]
+
+    def exists(self, user_id: int, skill_id: int) -> bool:
+        return (
+            self.db.query(UserSkill)
+            .filter(
+                UserSkill.user_id == user_id,
+                UserSkill.skill_id == skill_id,
+            )
+            .first()
+            is not None
+        )

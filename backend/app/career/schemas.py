@@ -21,6 +21,7 @@ class AppraisalResponse(BaseModel):
     period: str
     self_review: Optional[str] = None
     manager_feedback: Optional[str] = None
+    performance_rating: Optional[str] = None
     status: str
 
     class Config:
@@ -49,3 +50,42 @@ class AchievementItem(BaseModel):
     title: str
     date: Optional[str] = None
     type: str  # "goal" | "course"
+
+
+# Career growth (Goals/Skills/Achievements tabs + progress % + AI mentor)
+class InProgressCourseItem(BaseModel):
+    enrollment_id: int
+    course_id: int
+    course_title: str
+    progress_state: str
+
+
+class SkillItem(BaseModel):
+    id: int
+    name: str
+    category: str
+
+
+class SkillsTabResponse(BaseModel):
+    existing: List[SkillItem]
+    from_courses: List[SkillItem]
+    from_certs: List[SkillItem]
+
+
+class AchievementCardResponse(BaseModel):
+    certification_name: str
+    issuing_organization: str
+    date_completed: Optional[str] = None
+
+
+class CareerGrowthSummaryResponse(BaseModel):
+    goals_tab: List[InProgressCourseItem]
+    skills_tab: SkillsTabResponse
+    achievements_tab: List[AchievementCardResponse]
+    progress_pct: float
+    next_target_role: Optional[str] = None
+
+
+class MentorSuggestionsResponse(BaseModel):
+    suggestions: str
+    skill_gaps: str

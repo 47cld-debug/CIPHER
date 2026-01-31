@@ -1,5 +1,13 @@
 import apiClient from './client';
-import type { Goal, Appraisal, CareerSummary, CareerSkill, AchievementItem } from '../types/career';
+import type {
+  Goal,
+  Appraisal,
+  CareerSummary,
+  CareerSkill,
+  AchievementItem,
+  CareerGrowthSummary,
+  MentorSuggestions,
+} from '../types/career';
 
 export const careerApi = {
   getGoals: async (): Promise<Goal[]> => {
@@ -24,6 +32,16 @@ export const careerApi = {
 
   getCareerAchievements: async (): Promise<AchievementItem[]> => {
     const response = await apiClient.get('/career/achievements');
+    return response.data;
+  },
+
+  getCareerGrowthSummary: async (): Promise<CareerGrowthSummary> => {
+    const response = await apiClient.get('/career/growth');
+    return response.data;
+  },
+
+  getCareerMentorSuggestions: async (): Promise<MentorSuggestions> => {
+    const response = await apiClient.get('/career/mentor-suggestions');
     return response.data;
   },
 };

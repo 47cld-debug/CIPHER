@@ -268,5 +268,89 @@ Provide a clear, helpful, and accurate answer based on the policies. If the ques
             logger.error(f"OpenAI API error: {e}")
             return f"I'm having trouble processing your question. Please try again later or contact {agent_type.upper()} directly."
 
+    async def get_career_suggestions(
+        self,
+        user_profile: Dict,
+        company_roles: List[Dict],
+        user_skills: List[str],
+    ) -> Dict[str, str]:
+        """
+        Act as career mentor: suggest career paths and skill gaps.
+        user_profile: { job_title, performance_rating, full_name }
+        company_roles: [ { name, required_skills: [...] } ]
+        user_skills: list of skill names the user has
+        Returns: { "suggestions": "...", "skill_gaps": "..." }
+        """
+        if not self.client:
+            return self._get_mock_career_suggestions(user_profile, company_roles, user_skills)
+
+        try:
+            roles_text = "\n".join([
+                f"- {r.get('name', '')}: requires {', '.join(r.get('required_skills', []))}"
+                for r in company_roles
+            ])
+            prompt = f"""You are a career mentor. Analyze this employee profile and company roles.
+
+Employee profile:
+- Current job role: {user_profile.get('job_title', 'Not specified')}
+- Performance rating: {user_profile.get('performance_rating', 'Not specified')}
+- Name: {user_profile.get('full_name', '')}
+
+Skills the employee has: {', '.join(user_skills) if user_skills else 'None listed'}
+
+Company roles and required skills:
+{roles_text}
+
+Provide two parts in your response:
+
+1) CAREER PATH SUGGESTIONS (2-4 bullet points): Based on their experience and skills, suggest specific next roles they could grow toward (use the company role names above). Example: "Based on your experience in frontend development, you could grow toward: Senior Frontend Engineer, UI Architect, Full Stack Developer."
+
+2) SKILL GAPS: For each suggested role, list the skills they still need. Example: "To reach Senior Frontend Engineer you need: System Design, Performance Optimization, API Integration."
+
+Format your reply with clear headings "CAREER PATH SUGGESTIONS" and "SKILL GAPS" so the two parts can be split."""
+
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a career mentor. Be concise and use the company role names and skill names provided."},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.5,
+            )
+            content = response.choices[0].message.content or ""
+            suggestions, skill_gaps = self._split_career_response(content)
+            return {"suggestions": suggestions, "skill_gaps": skill_gaps}
+        except Exception as e:
+            logger.error(f"OpenAI API error (career): {e}")
+            return self._get_mock_career_suggestions(user_profile, company_roles, user_skills)
+
+    def _split_career_response(self, content: str) -> tuple:
+        """Split AI response into suggestions and skill_gaps by headings."""
+        suggestions = ""
+        skill_gaps = ""
+        if "SKILL GAPS" in content.upper():
+            parts = content.upper().split("SKILL GAPS")
+            if len(parts) >= 2:
+                suggestions = content[: content.upper().rfind("SKILL GAPS")].strip()
+                skill_gaps = content[content.upper().rfind("SKILL GAPS") + len("SKILL GAPS") :].strip()
+            else:
+                suggestions = content
+        else:
+            suggestions = content
+        return suggestions, skill_gaps
+
+    def _get_mock_career_suggestions(
+        self, user_profile: Dict, company_roles: List[Dict], user_skills: List[str]
+    ) -> Dict[str, str]:
+        """Mock career suggestions when OpenAI is not configured."""
+        role_names = [r.get("name", "") for r in company_roles if r.get("name")][:3]
+        suggestions = (
+            f"Based on your profile ({user_profile.get('job_title', 'Current role')}), "
+            f"you could grow toward: {', '.join(role_names or ['Senior roles'])}. "
+            "Configure OPENAI_API_KEY for personalized AI suggestions."
+        )
+        skill_gaps = "To get personalized skill gaps, add OPENAI_API_KEY to your backend .env and refresh."
+        return {"suggestions": suggestions, "skill_gaps": skill_gaps}
+
 
 openai_service = OpenAIService()

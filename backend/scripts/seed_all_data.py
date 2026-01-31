@@ -15,7 +15,7 @@ from app.config import settings
 from models.employee import Employee
 from models.user import User, UserRole
 from models.dashboard import Widget, UserWidget
-from models.learning import Course, Enrollment, CourseType, ProgressState, EnrollmentStatus, Skill, CourseSkill, SkillCategory
+from models.learning import Course, Enrollment, CourseType, ProgressState, EnrollmentStatus, Skill, CourseSkill, SkillCategory, UserSkill
 from models.career import Goal, Appraisal, GoalStatus, AppraisalStatus
 from models.compliance import Policy, FAQ, Reminder
 from models.wellness import Initiative, Session, SessionStatus
@@ -167,6 +167,90 @@ def seed_courses():
     db.commit()
     return created_courses
 
+def seed_skills():
+    """Seed skills for courses and career mentor."""
+    skills_data = [
+        ("Python", SkillCategory.TECHNICAL),
+        ("React", SkillCategory.TECHNICAL),
+        ("System Design", SkillCategory.TECHNICAL),
+        ("Performance Optimization", SkillCategory.TECHNICAL),
+        ("API Integration", SkillCategory.TECHNICAL),
+        ("Leadership", SkillCategory.SOFT),
+        ("Communication", SkillCategory.SOFT),
+        ("Data Analysis", SkillCategory.TECHNICAL),
+    ]
+    all_skills = []
+    for name, category in skills_data:
+        existing = db.query(Skill).filter(Skill.name == name).first()
+        if not existing:
+            skill = Skill(name=name, category=category)
+            db.add(skill)
+            all_skills.append(skill)
+            print(f"✓ Created skill: {name}")
+        else:
+            all_skills.append(existing)
+    db.commit()
+    return all_skills
+
+def seed_course_skills(courses, skills):
+    """Link courses to skills by title -> skill names."""
+    if not courses or not skills:
+        return
+    name_to_skill = {s.name: s for s in skills}
+    # course index in created_courses -> list of skill names
+    course_skills_map = [
+        ["Python", "Data Analysis"],           # 0 Python for Data Science
+        ["React", "Performance Optimization"], # 1 React Advanced Patterns
+        ["Leadership", "Communication"],       # 2 Leadership Fundamentals
+        ["Communication"],                     # 3 Effective Communication
+        ["Leadership"],                        # 4 Agile Project Management
+        ["Communication"],                     # 5 Time Management Mastery
+        ["System Design", "API Integration"],  # 6 Cloud Architecture with AWS
+        ["Leadership", "Communication"],       # 7 Emotional Intelligence at Work
+    ]
+    for i, course in enumerate(courses[: len(course_skills_map)]):
+        if i >= len(course_skills_map):
+            break
+        for skill_name in course_skills_map[i]:
+            skill = name_to_skill.get(skill_name)
+            if not skill:
+                continue
+            existing = db.query(CourseSkill).filter(
+                CourseSkill.course_id == course.id,
+                CourseSkill.skill_id == skill.id,
+            ).first()
+            if not existing:
+                db.add(CourseSkill(course_id=course.id, skill_id=skill.id))
+        print(f"✓ Linked skills to course: {course.title}")
+    db.commit()
+
+def seed_user_skills(users, skills):
+    """Attach some skills to users (skills user already has)."""
+    if len(users) < 1 or not skills:
+        return
+    name_to_skill = {s.name: s for s in skills}
+    # User 0: Python, Communication; User 1: React; User 2: Leadership
+    user_skills_map = [
+        ["Python", "Communication"],
+        ["React", "Communication"],
+        ["Leadership", "Communication"],
+    ]
+    for i, user in enumerate(users[: len(user_skills_map)]):
+        if i >= len(user_skills_map):
+            break
+        for skill_name in user_skills_map[i]:
+            skill = name_to_skill.get(skill_name)
+            if not skill:
+                continue
+            existing = db.query(UserSkill).filter(
+                UserSkill.user_id == user.id,
+                UserSkill.skill_id == skill.id,
+            ).first()
+            if not existing:
+                db.add(UserSkill(user_id=user.id, skill_id=skill.id))
+        print(f"✓ Assigned skills to {user.full_name}")
+    db.commit()
+
 def seed_enrollments(courses, users):
     """Seed course enrollments"""
     if len(users) < 3 or len(courses) < 8:
@@ -282,6 +366,7 @@ def seed_appraisals(users):
             "period": "Q4 2024",
             "self_review": "I have made significant progress in my technical skills and completed several key projects. I'm looking forward to taking on more leadership responsibilities.",
             "manager_feedback": "Excellent work this quarter. Strong technical performance and good team collaboration. Ready for more challenging assignments.",
+            "performance_rating": "Exceeds",
             "status": AppraisalStatus.REVIEWED
         },
         {
@@ -289,6 +374,7 @@ def seed_appraisals(users):
             "period": "Q4 2024",
             "self_review": "Completed React course and successfully implemented new patterns in our frontend. Working on improving communication with cross-functional teams.",
             "manager_feedback": "Great technical contributions. Continue focusing on communication skills development.",
+            "performance_rating": "Meets",
             "status": AppraisalStatus.SUBMITTED
         },
         {
@@ -296,6 +382,7 @@ def seed_appraisals(users):
             "period": "Q4 2024",
             "self_review": "Focused on cloud technologies and emotional intelligence. Completed wellness initiatives and improved work-life balance.",
             "manager_feedback": "Strong growth in technical and soft skills. Well-rounded performance.",
+            "performance_rating": "Meets",
             "status": AppraisalStatus.DRAFT
         }
     ]
@@ -589,9 +676,22 @@ def main():
         courses = seed_courses()
         print()
         
+        # Seed skills and link to courses / users
+        print("3b. Seeding skills...")
+        skills = seed_skills()
+        print()
+        print("3c. Linking courses to skills...")
+        seed_course_skills(courses, skills)
+        print()
+        
         # Seed enrollments
         print("4. Seeding enrollments...")
         seed_enrollments(courses, users)
+        print()
+        
+        # Seed user skills (skills user already has)
+        print("4b. Seeding user skills...")
+        seed_user_skills(users, skills)
         print()
         
         # Seed goals
