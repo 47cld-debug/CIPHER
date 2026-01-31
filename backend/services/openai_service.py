@@ -214,5 +214,59 @@ class OpenAIService:
                 })
         return matched[:5] if matched else courses[:3]
 
+    async def get_agent_response(
+        self,
+        query: str,
+        context: str,
+        agent_type: str,
+        policy_references: List[str] = None
+    ) -> str:
+        """
+        Get agent response with context from RAG
+        
+        Args:
+            query: User's question
+            context: Retrieved policy/document context
+            agent_type: "hr" or "it"
+            policy_references: List of referenced policy/document names
+            
+        Returns:
+            Generated response text
+        """
+        if not self.client:
+            return f"I'm currently in demo mode. Please contact {agent_type.upper()} for assistance."
+        
+        try:
+            agent_role = "HR assistant" if agent_type == "hr" else "IT support assistant"
+            policy_refs = "\n".join([f"- {ref}" for ref in (policy_references or [])])
+            
+            # Build the relevant policies section separately
+            relevant_policies_section = ""
+            if policy_refs:
+                relevant_policies_section = f"\n\nRelevant Policies:\n{policy_refs}"
+            
+            prompt = f"""You are a helpful {agent_role}. Answer the user's question based on the following company policy context.
+
+Policy Context:
+{context}{relevant_policies_section}
+
+User Question: {query}
+
+Provide a clear, helpful, and accurate answer based on the policies. If the question relates to compliance, indicate whether the action is compliant or not."""
+            
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": f"You are a helpful {agent_role}."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3
+            )
+            
+            return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"OpenAI API error: {e}")
+            return f"I'm having trouble processing your question. Please try again later or contact {agent_type.upper()} directly."
+
 
 openai_service = OpenAIService()

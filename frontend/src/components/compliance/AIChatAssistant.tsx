@@ -8,11 +8,14 @@ import {
   CircularProgress,
   Avatar,
   Fade,
+  Chip,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
-import { useAIChat } from '../../hooks/useApi';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { useComplianceChat } from '../../hooks/useApi';
 import { useUI } from '../../contexts/UIContext';
 
 interface Message {
@@ -20,6 +23,9 @@ interface Message {
   text: string;
   sender: 'user' | 'ai';
   timestamp: Date;
+  agent?: 'hr' | 'it' | 'both';
+  compliant?: boolean | null;
+  policy_references?: string[];
 }
 
 const AIChatAssistant: React.FC = () => {
@@ -27,7 +33,7 @@ const AIChatAssistant: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm your AI compliance assistant. Ask me anything about company policies, leave policies, expenses, or compliance questions.",
+      text: "Hello! I'm your AI compliance assistant. I can help you with HR and IT policies. Ask me anything about company policies, leave, expenses, security, or compliance questions.",
       sender: 'ai',
       timestamp: new Date(),
     },
@@ -35,7 +41,7 @@ const AIChatAssistant: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatMutation = useAIChat();
+  const chatMutation = useComplianceChat();
   const { addNotification } = useUI();
 
   const scrollToBottom = () => {
@@ -61,16 +67,16 @@ const AIChatAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await chatMutation.mutateAsync({
-        message: input.trim(),
-        context: 'compliance',
-      });
+      const response = await chatMutation.mutateAsync(input.trim());
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: response.response,
         sender: 'ai',
         timestamp: new Date(),
+        agent: response.agent,
+        compliant: response.compliant,
+        policy_references: response.policy_references || [],
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -217,9 +223,58 @@ const AIChatAssistant: React.FC = () => {
                   border: message.sender === 'ai' ? '1px solid rgba(220, 20, 60, 0.2)' : 'none',
                 }}
               >
+                {message.sender === 'ai' && message.agent && (
+                  <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                    <Chip
+                      label={message.agent.toUpperCase()}
+                      size="small"
+                      sx={{
+                        bgcolor: message.agent === 'hr' ? '#4caf50' : message.agent === 'it' ? '#2196f3' : '#ff9800',
+                        color: 'white',
+                        fontWeight: 600,
+                        fontSize: '0.7rem',
+                      }}
+                    />
+                    {message.compliant !== null && message.compliant !== undefined && (
+                      <Chip
+                        icon={message.compliant ? <CheckCircleOutlineIcon /> : <CancelOutlinedIcon />}
+                        label={message.compliant ? 'Compliant' : 'Not Compliant'}
+                        size="small"
+                        sx={{
+                          bgcolor: message.compliant ? '#4caf50' : '#f44336',
+                          color: 'white',
+                          fontWeight: 600,
+                          fontSize: '0.7rem',
+                        }}
+                      />
+                    )}
+                  </Box>
+                )}
                 <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
                   {message.text}
                 </Typography>
+                {message.sender === 'ai' && message.policy_references && message.policy_references.length > 0 && (
+                  <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px solid rgba(0, 0, 0, 0.1)' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+                      Referenced Policies:
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {message.policy_references.map((ref, idx) => (
+                        <Chip
+                          key={idx}
+                          label={ref}
+                          size="small"
+                          sx={{
+                            bgcolor: 'rgba(220, 20, 60, 0.1)',
+                            color: '#DC143C',
+                            fontSize: '0.65rem',
+                            height: '20px',
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                )}
               </Paper>
               {message.sender === 'user' && (
                 <Avatar

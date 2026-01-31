@@ -35,4 +35,17 @@ export interface UploadResponse {
 
 export interface ComplianceChatResponse {
   response: string;
+  agent: 'hr' | 'it' | 'both';
+  compliant?: boolean | null;
+  policy_references: string[];
+}
+
+export interface ComplianceDocumentResponse {
+  id: number;
+  filename: string;
+  category: string;
+  uploaded_by: number;
+  uploaded_at: string;
+  chunk_count: number;
+  file_size?: number | null;
 }

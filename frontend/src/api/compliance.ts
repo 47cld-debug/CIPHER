@@ -6,6 +6,7 @@ import type {
   DocumentInfo,
   UploadResponse,
   ComplianceChatResponse,
+  ComplianceDocumentResponse,
 } from '../types/compliance';
 
 export const complianceApi = {
@@ -47,6 +48,27 @@ export const complianceApi = {
 
   complianceChat: async (message: string): Promise<ComplianceChatResponse> => {
     const response = await apiClient.post('/compliance/chat', { message });
+    return response.data;
+  },
+
+  // Admin document management
+  uploadComplianceDocuments: async (files: File[]): Promise<UploadResponse> => {
+    const formData = new FormData();
+    files.forEach((f) => formData.append('files', f));
+    const response = await apiClient.post('/compliance/admin/documents/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000, // 2 minutes for processing
+    });
+    return response.data;
+  },
+
+  getComplianceDocuments: async (): Promise<ComplianceDocumentResponse[]> => {
+    const response = await apiClient.get('/compliance/admin/documents');
+    return response.data;
+  },
+
+  deleteComplianceDocument: async (documentId: number): Promise<{ deleted: boolean }> => {
+    const response = await apiClient.delete(`/compliance/admin/documents/${documentId}`);
     return response.data;
   },
 };

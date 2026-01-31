@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
     
+    # ChromaDB
+    CHROMADB_PERSIST_DIR: str = "./chroma_db"
+    CHROMADB_COLLECTION_HR: str = "hr_policies"
+    CHROMADB_COLLECTION_IT: str = "it_policies"
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

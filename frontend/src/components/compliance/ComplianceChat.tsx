@@ -34,11 +34,10 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { data: docsData, isLoading: docsLoading } = useComplianceDocuments();
+  const { data: documents = [], isLoading: docsLoading } = useComplianceDocuments();
   const chatMutation = useComplianceChat();
   const { addNotification } = useUI();
 
-  const documents = docsData?.documents ?? [];
   const hasDocs = documents.length > 0;
 
   const scrollToBottom = () => {
@@ -101,34 +100,6 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
     );
   }
 
-  if (!hasDocs) {
-    return (
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          border: BORDER,
-          textAlign: 'center',
-          minHeight: embedded ? 200 : 320,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'rgba(220, 20, 60, 0.03)',
-        }}
-      >
-        <SmartToyIcon sx={{ color: CRIMSON, fontSize: 48, mb: 2, opacity: 0.7 }} />
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 320 }}>
-          Upload documents to start asking questions.
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Upload HR, IT, or compliance documents (PDF, DOC, TXT) above to enable the assistant.
-        </Typography>
-      </Paper>
-    );
-  }
-
   return (
     <Paper
       elevation={0}
@@ -157,7 +128,9 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
           <Fade in>
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <Typography variant="body2" color="text.secondary">
-                Ask about your uploaded documents (HR, IT, leave, compliance).
+                {hasDocs 
+                  ? 'Ask about your uploaded documents (HR, IT, leave, compliance).'
+                  : 'Ask me anything about company policies, leave, expenses, IT issues, or compliance questions.'}
               </Typography>
             </Box>
           </Fade>
@@ -214,7 +187,7 @@ const ComplianceChat: React.FC<ComplianceChatProps> = ({ embedded = false }) => 
         <TextField
           fullWidth
           size="small"
-          placeholder="Ask about policies, leave, compliance..."
+          placeholder={hasDocs ? "Ask about policies, leave, compliance..." : "Ask about company policies, leave, expenses, IT issues..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}

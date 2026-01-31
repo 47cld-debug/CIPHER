@@ -68,11 +68,10 @@ export const useDeleteEnrollment = () => {
 };
 
 // Dashboard hooks
-export const useDashboard = (enabled = true) => {
+export const useDashboard = () => {
   return useQuery({
     queryKey: ['dashboard'],
     queryFn: () => dashboardApi.getDashboard(),
-    enabled,
     retry: 1,
     retryDelay: 1000,
     staleTime: 30000,
@@ -161,43 +160,6 @@ export const useReminders = () => {
   });
 };
 
-// RAG Compliance Chatbot
-export const useComplianceDocuments = () => {
-  return useQuery({
-    queryKey: ['compliance', 'documents'],
-    queryFn: () => complianceApi.getDocuments(),
-    retry: 1,
-    retryDelay: 1000,
-    staleTime: 10000,
-  });
-};
-
-export const useUploadComplianceDocuments = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (files: File[]) => complianceApi.uploadDocuments(files),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['compliance', 'documents'] });
-    },
-  });
-};
-
-export const useClearComplianceDocuments = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: () => complianceApi.clearDocuments(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['compliance', 'documents'] });
-    },
-  });
-};
-
-export const useComplianceChat = () => {
-  return useMutation({
-    mutationFn: (message: string) => complianceApi.complianceChat(message),
-  });
-};
-
 // Wellness hooks
 export const useInitiatives = () => {
   return useQuery({
@@ -254,6 +216,42 @@ export const useSessions = () => {
 export const useAIChat = () => {
   return useMutation({
     mutationFn: (data: { message: string; context?: string }) => aiApi.chat(data),
+  });
+};
+
+export const useComplianceChat = () => {
+  return useMutation({
+    mutationFn: (message: string) => complianceApi.complianceChat(message),
+  });
+};
+
+// Admin Compliance Document Management hooks
+export const useComplianceDocuments = () => {
+  return useQuery({
+    queryKey: ['complianceDocuments'],
+    queryFn: () => complianceApi.getComplianceDocuments(),
+    retry: 1,
+    staleTime: 30000,
+  });
+};
+
+export const useUploadComplianceDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (files: File[]) => complianceApi.uploadComplianceDocuments(files),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['complianceDocuments'] });
+    },
+  });
+};
+
+export const useDeleteComplianceDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (documentId: number) => complianceApi.deleteComplianceDocument(documentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['complianceDocuments'] });
+    },
   });
 };
 

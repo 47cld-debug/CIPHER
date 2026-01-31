@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from openai import RateLimitError, AuthenticationError
 from typing import List, Optional
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_current_admin_user
 from models.user import User
 from app.compliance.schemas import (
     PolicyResponse,
@@ -13,6 +13,7 @@ from app.compliance.schemas import (
     DocumentInfo,
     ComplianceChatRequest,
     ComplianceChatResponse,
+    ComplianceDocumentResponse,
 )
 from app.compliance.service import ComplianceService
 
@@ -54,13 +55,14 @@ QUOTA_MSG = "OpenAI quota exceeded. Please check your plan and billing at https:
 AUTH_MSG = "Invalid OpenAI API key. Please check OPENAI_API_KEY in backend/.env and restart the server."
 
 
-@router.post("/documents/upload", response_model=UploadResponse)
-async def upload_documents(
-    current_user: User = Depends(get_current_user),
+# Admin-only document upload endpoints
+@router.post("/admin/documents/upload", response_model=UploadResponse)
+async def upload_documents_admin(
+    current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
     files: List[UploadFile] = File(...),
 ):
-    """Upload PDF/DOC/TXT for RAG. Parsed, chunked, embedded, stored per user."""
+    """Admin-only: Upload PDF/DOC/TXT for RAG. Documents are processed, chunked, and stored in ChromaDB."""
     service = ComplianceService(db)
     file_list = []
     for f in files:
@@ -69,12 +71,54 @@ async def upload_documents(
         content = await f.read()
         file_list.append((f.filename, content))
     try:
-        uploaded, chunks_added = service.upload_documents(current_user.id, file_list)
+        uploaded, chunks_added = await service.upload_documents_admin(current_user.id, file_list)
         return UploadResponse(uploaded=uploaded, chunks_added=chunks_added)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except RateLimitError:
         raise HTTPException(status_code=503, detail=QUOTA_MSG)
     except AuthenticationError:
         raise HTTPException(status_code=401, detail=AUTH_MSG)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading documents: {str(e)}")
+
+
+@router.get("/admin/documents", response_model=List[ComplianceDocumentResponse])
+def get_all_documents(
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+):
+    """Admin-only: List all uploaded compliance documents."""
+    service = ComplianceService(db)
+    return service.get_all_documents()
+
+
+@router.delete("/admin/documents/{document_id}")
+def delete_document(
+    document_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+):
+    """Admin-only: Delete a compliance document."""
+    service = ComplianceService(db)
+    success = service.delete_document(document_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"deleted": True, "document_id": document_id}
+
+
+# Legacy user upload endpoint - kept for backward compatibility but deprecated
+@router.post("/documents/upload", response_model=UploadResponse, deprecated=True)
+async def upload_documents(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    files: List[UploadFile] = File(...),
+):
+    """DEPRECATED: Document upload is now admin-only. Use /admin/documents/upload instead."""
+    raise HTTPException(
+        status_code=403,
+        detail="Document upload is restricted to administrators. Please contact an admin to upload compliance documents."
+    )
 
 
 @router.get("/documents", response_model=dict)
@@ -105,12 +149,15 @@ async def compliance_chat(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """RAG chat: answer only from uploaded documents. Guardrails for no docs or off-topic."""
+    """RAG chat with agent coordination: routes to HR/IT agents and synthesizes responses."""
     service = ComplianceService(db)
     try:
-        response = await service.compliance_chat(current_user.id, request.message)
-        return ComplianceChatResponse(response=response)
+        result = await service.compliance_chat_with_agents(request.message)
+        return ComplianceChatResponse(**result)
     except RateLimitError:
         raise HTTPException(status_code=503, detail=QUOTA_MSG)
     except AuthenticationError:
         raise HTTPException(status_code=401, detail=AUTH_MSG)
+    except Exception as e:
+        logger.error(f"Error in compliance chat: {e}")
+        raise HTTPException(status_code=500, detail=f"Error processing chat request: {str(e)}")

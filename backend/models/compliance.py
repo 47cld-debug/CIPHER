@@ -43,3 +43,19 @@ class Reminder(Base):
 
     # Relationships
     user = relationship("User", back_populates="reminders")
+
+
+class ComplianceDocument(Base):
+    __tablename__ = "compliance_documents"
+
+    id = Column(Integer, primary_key=True, index=True)
+    filename = Column(String, nullable=False)
+    category = Column(String, nullable=False)  # HR, IT, BOTH
+    uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
+    chunk_count = Column(Integer, default=0, nullable=False)
+    chromadb_collection = Column(String, nullable=True)  # "hr_policies" or "it_policies" or both
+    file_size = Column(Integer, nullable=True)  # Size in bytes
+
+    # Relationships
+    uploader = relationship("User", foreign_keys=[uploaded_by])

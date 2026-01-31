@@ -16,7 +16,7 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import { useComplianceDocuments, useUploadComplianceDocuments, useClearComplianceDocuments } from '../../hooks/useApi';
+import { useComplianceDocuments, useUploadComplianceDocument } from '../../hooks/useApi';
 import { useUI } from '../../contexts/UIContext';
 
 const CRIMSON = '#DC143C';
@@ -33,15 +33,12 @@ function getFileIcon(filename: string) {
 const ComplianceUploadPanel: React.FC = () => {
   const [dragOver, setDragOver] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const { data: docsData, isLoading: docsLoading } = useComplianceDocuments();
-  const uploadMutation = useUploadComplianceDocuments();
-  const clearMutation = useClearComplianceDocuments();
+  const { data: documents = [], isLoading: docsLoading } = useComplianceDocuments();
+  const uploadMutation = useUploadComplianceDocument();
   const { addNotification } = useUI();
 
-  const documents = docsData?.documents ?? [];
   const hasDocs = documents.length > 0;
   const isUploading = uploadMutation.isPending;
-  const isClearing = clearMutation.isPending;
 
   const validateFiles = (files: FileList | File[]): File[] => {
     const arr = Array.from(files);
@@ -103,22 +100,7 @@ const ComplianceUploadPanel: React.FC = () => {
     [handleUpload]
   );
 
-  const handleClear = useCallback(async () => {
-    try {
-      await clearMutation.mutateAsync();
-      addNotification({
-        id: Date.now().toString(),
-        message: 'Documents cleared. You can upload new ones.',
-        type: 'success',
-      });
-    } catch (err: any) {
-      addNotification({
-        id: Date.now().toString(),
-        message: err.response?.data?.detail || 'Failed to clear documents.',
-        type: 'error',
-      });
-    }
-  }, [clearMutation, addNotification]);
+  // Note: Clear functionality removed - documents should be deleted individually via admin panel
 
   return (
     <Paper
@@ -200,31 +182,21 @@ const ComplianceUploadPanel: React.FC = () => {
       ) : hasDocs ? (
         <>
           <List dense sx={{ flex: 1, overflow: 'auto' }}>
-            {documents.map((d) => (
-              <ListItem key={d.filename} sx={{ px: 0, py: 0.5 }}>
+            {documents.map((d: any) => (
+              <ListItem key={d.id || d.filename} sx={{ px: 0, py: 0.5 }}>
                 <ListItemIcon sx={{ minWidth: 36 }}>{getFileIcon(d.filename)}</ListItemIcon>
                 <ListItemText
                   primary={d.filename}
-                  secondary={`${d.chunks} chunk(s)`}
+                  secondary={`${d.chunk_count || d.chunks || 0} chunk(s)`}
                   primaryTypographyProps={{ variant: 'body2', noWrap: true }}
                   secondaryTypographyProps={{ variant: 'caption' }}
                 />
               </ListItem>
             ))}
           </List>
-          <Button
-            startIcon={isClearing ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <DeleteSweepIcon />}
-            size="small"
-            onClick={handleClear}
-            disabled={isClearing}
-            sx={{
-              mt: 2,
-              color: CRIMSON,
-              '&:hover': { bgcolor: 'rgba(220, 20, 60, 0.08)' },
-            }}
-          >
-            Clear all
-          </Button>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 2, textAlign: 'center', display: 'block' }}>
+            Documents are managed in the Admin panel
+          </Typography>
         </>
       ) : (
         <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>

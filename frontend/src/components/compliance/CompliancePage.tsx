@@ -20,6 +20,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { usePolicies, useFAQs, useReminders } from '../../hooks/useApi';
+import { useAuth } from '../../contexts/AuthContext';
 import ComplianceUploadPanel from './ComplianceUploadPanel';
 import ComplianceChat from './ComplianceChat';
 
@@ -27,6 +28,8 @@ const CompliancePage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [faqCategory, setFaqCategory] = useState<string>('');
   const [tab, setTab] = useState(0);
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const { data: policies = [], isLoading: policiesLoading, isError: policiesError, error: policiesErrorData } = usePolicies(search || undefined);
   const { data: faqs = [], isLoading: faqsLoading, isError: faqsError, error: faqsErrorData } = useFAQs(faqCategory || undefined);
@@ -140,14 +143,18 @@ const CompliancePage: React.FC = () => {
         </Tabs>
         <Box sx={{ p: 3 }}>
           {tab === 0 && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <ComplianceUploadPanel />
+            isAdmin ? (
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  <ComplianceUploadPanel />
+                </Grid>
+                <Grid item xs={12} md={8}>
+                  <ComplianceChat embedded />
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={8}>
-                <ComplianceChat embedded />
-              </Grid>
-            </Grid>
+            ) : (
+              <ComplianceChat embedded={false} />
+            )
           )}
           {tab === 1 && (
             <Grid container spacing={3}>
