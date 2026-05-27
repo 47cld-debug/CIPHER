@@ -1,0 +1,109 @@
+name: CIPHER CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Triggers pipeline on commits to main branch
+
+jobs:
+  build-and-push-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/cipher-backend:latest
+            ${{ secrets.DOCKER_USERNAME }}/cipher-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-push-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/cipher-frontend:latest
+            ${{ secrets.DOCKER_USERNAME }}/cipher-frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-to-ec2:
+    needs: [build-and-push-backend, build-and-push-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            # Create deployment directory if it doesn't exist
+            mkdir -p ~/cipher-app
+            cd ~/cipher-app
+            
+            # Write out environment file for docker-compose
+            echo "DB_USER=${{ secrets.DB_USER }}" > .env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+            echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+            
+            # Optional: Log in to Docker Hub on EC2 if using private repositories
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            
+            # Fetch the docker-compose file directly from GitHub repository using curl or git.
+            # This avoids cloning the whole codebase on EC2.
+            curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/main/docker-compose.yml -o docker-compose.yml
+            
+            # Update docker-compose image tags to pull custom images
+            # Replace placeholder image names with Docker Hub names
+            sed -i 's|build:.*|image: ${{ secrets.DOCKER_USERNAME }}/cipher-backend:latest|g' docker-compose.yml
+            # Note: Because docker-compose file structure uses custom build parameters,
+            # we want to fetch a clean compose file and run it. Let's make sure sed command rewrites properly,
+            # or we can simply replace the context lines with image targets.
+            # A cleaner way is using sed to clean up builds or just writing a compose file dynamically.
+            # Let's provide a pre-configured compose file on the server.
+            
+            # Pull the latest built images from Docker Hub
+            docker compose pull
+            
+            # Restart the services with the new pulled images
+            docker compose up -d --remove-orphans
+            
+            # Clean up old unused images to save disk space on EC2
+            docker image prune -f
