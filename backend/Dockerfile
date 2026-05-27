@@ -7,14 +7,19 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install system dependencies (needed for compiling some packages or running migrations)
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install python packages
+# Pre-install CPU-only PyTorch and Sentence-Transformers to avoid loading massive CUDA (Nvidia) binaries
+# This keeps the image small and prevents the EC2 instance from running out of RAM during the build.
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir sentence-transformers --index-url https://download.pytorch.org/whl/cpu
+
+# Copy requirements and install remaining python packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
