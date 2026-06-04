@@ -14,10 +14,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Pre-install CPU-only PyTorch and Sentence-Transformers to avoid loading massive CUDA (Nvidia) binaries
-# This keeps the image small and prevents the EC2 instance from running out of RAM during the build.
+# Pre-install CPU-only PyTorch (from PyTorch CPU registry)
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache-dir sentence-transformers --index-url https://download.pytorch.org/whl/cpu
+
+# Install sentence-transformers (from PyPI, it will detect the pre-installed CPU Torch)
+RUN pip install --no-cache-dir sentence-transformers
 
 # Copy requirements and install remaining python packages
 COPY requirements.txt .
